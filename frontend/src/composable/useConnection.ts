@@ -34,5 +34,16 @@ export function useConnection () {
     });
   }
 
-  return { connectServer, createRoom, joinedPlayer }
+  
+
+  function votePlayer (vote: number,  callback?: (response: any) => void):void {
+    const roomId:string = userStore.roomId;
+    
+    socket.emit('votePlayer', {roomId, vote}, (response: any) => {
+      console.log(response);
+      if (callback) callback(response);
+    });
+  }
+
+  return { connectServer, createRoom, joinedPlayer, votePlayer }
 }

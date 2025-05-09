@@ -114,3 +114,8 @@ h1, h2, h3, p, span {
 .fade-enter-to, .fade-leave-from {
   opacity: 1;
 }
+
+.cardActive {
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1));
+}

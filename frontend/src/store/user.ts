@@ -7,7 +7,8 @@ export const useUserStore = defineStore('user', {
 		roomId: '',
     socketId: null as string | null | undefined,
 		isAdmin: false,
-		isSpectator: false
+		isSpectator: false,
+    currentVote: 0
 	}),
 	actions: {
 		setUser(
@@ -25,6 +26,9 @@ export const useUserStore = defineStore('user', {
 		},
     setSocketId (socketId: string | null | undefined) {
       this.socketId = socketId;
+    },
+    setVote(vote: number) {
+      this.currentVote = vote;
     }
 	}
 });

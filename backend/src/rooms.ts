@@ -2,6 +2,11 @@ import { Server, Socket } from "socket.io";
 
 export function setupRooms(io: Server) {
 
+  type Vote = {
+    userName: string;
+    vote: number | null;
+  };
+
   type Room = {
     roomName: string;
     players: {
@@ -9,6 +14,7 @@ export function setupRooms(io: Server) {
         userName: string;
         isAdmin: boolean;
         isSpectator?: boolean;
+        vote?: number
       };
     };
   };
@@ -21,6 +27,12 @@ export function setupRooms(io: Server) {
     success: boolean;
     message: string;
     room?: typeof rooms;
+  };
+
+  type CallbackResponseRoom = {
+    success: boolean;
+    message: string;
+    room: Room;
   };
 
   io.on('connection', (socket: Socket) => {
@@ -87,6 +99,40 @@ export function setupRooms(io: Server) {
         });
       }
     );
+
+    socket.on(
+      "votePlayer",
+      (
+        data: {roomId: string, vote: number},
+        callback: (response: CallbackResponse) => void
+      ) => {
+        const { roomId, vote } = data;
+
+        const room = rooms[roomId];
+        
+        if (!room) {
+          return callback({ success: false, message: `Sala ${roomId} não encontrada.`,  room: rooms });
+        }
+
+        rooms[roomId].players[socket.id].vote = vote;
+
+        return callback({
+          success: true,
+          message: "Voto registrado!!",
+          room: rooms,
+        });
+      }
+    );
+
+    socket.on('getPlayers', (roomId: string, callback: (response: CallbackResponseRoom) => void) => {
+
+      return callback({
+        success: true,
+        message: "Informações da Sala!!!",
+        room: rooms[roomId]
+      });
+
+    });
 
   });
 }

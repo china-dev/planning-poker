@@ -1,4 +1,10 @@
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
+
+type userVote = {
+  userName: string;
+  vote: number | null;
+};
 
 export const useUserStore = defineStore('user', {
 	state: () => ({
@@ -8,7 +14,8 @@ export const useUserStore = defineStore('user', {
     socketId: null as string | null | undefined,
 		isAdmin: false,
 		isSpectator: false,
-    currentVote: 0
+    currentVote: 0,
+    players: []
 	}),
 	actions: {
 		setUser(
@@ -29,6 +36,9 @@ export const useUserStore = defineStore('user', {
     },
     setVote(vote: number) {
       this.currentVote = vote;
+    },
+    setPlayers(players: []) {
+      this.players = players;
     }
 	}
 });

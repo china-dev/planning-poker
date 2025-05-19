@@ -1,11 +1,20 @@
 <script setup lang="ts">
+import { onMounted, onBeforeUnmount } from 'vue';
   import { useConnection } from './composable/useConnection';
   import { useUserStore } from "./store/user.ts";
 
-  const { connectServer } = useConnection();
+  const { createServer, disconnectServer} = useConnection();
+
+  onMounted(() => {
+    createServer();
+  });
+
+  onBeforeUnmount(() => {
+    disconnectServer();
+  });
+  
   const userStore = useUserStore();
 
-  connectServer();
 </script>
 
 <template>

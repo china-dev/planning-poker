@@ -2,37 +2,36 @@ import { Server, Socket } from "socket.io";
 
 export function setupRooms(io: Server) {
 
-  type Vote = {
+  type Player = {
     userName: string;
-    vote: number | null;
+    isAdmin: boolean;
+    isSpectator?: boolean;
+    vote?: number;
   };
-
+  
+  type Players = {
+    [socketId: string]: Player;
+  };
+  
   type Room = {
     roomName: string;
-    players: {
-      [socketId: string]: {
-        userName: string;
-        isAdmin: boolean;
-        isSpectator?: boolean;
-        vote?: number
-      };
-    };
+    players: Players;
   };
-
+  
   const rooms: {
-    [roomId: string]: Room
+    [roomId: string]: Room;
   } = {};
-
+  
   type CallbackResponse = {
     success: boolean;
     message: string;
     room?: typeof rooms;
   };
-
+  
   type CallbackResponseRoom = {
     success: boolean;
     message: string;
-    room: Room;
+    players?: Players;
   };
 
   io.on('connection', (socket: Socket) => {
@@ -106,15 +105,26 @@ export function setupRooms(io: Server) {
         data: {roomId: string, vote: number},
         callback: (response: CallbackResponse) => void
       ) => {
-        const { roomId, vote } = data;
 
+        const { roomId, vote } = data;
         const room = rooms[roomId];
-        
+        const player = room?.players[socket.id];
+
         if (!room) {
-          return callback({ success: false, message: `Sala ${roomId} não encontrada.`,  room: rooms });
+          return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+        }
+    
+        if (!player) {
+          return callback({ success: false, message: `Jogador não está na sala ${roomId}.` });
         }
 
-        rooms[roomId].players[socket.id].vote = vote;
+        player.vote = vote;
+
+        io.to(roomId).emit("playerVoted", {
+          socketId: socket.id,
+          userName: player.userName,
+          vote,
+        });
 
         return callback({
           success: true,
@@ -124,15 +134,24 @@ export function setupRooms(io: Server) {
       }
     );
 
-    socket.on('getPlayers', (roomId: string, callback: (response: CallbackResponseRoom) => void) => {
+    socket.on(
+      "getPlayers",
+      (
+        roomId: string,
+        callback: (response: CallbackResponseRoom) => void
+      ) => {
 
-      return callback({
-        success: true,
-        message: "Informações da Sala!!!",
-        room: rooms[roomId]
-      });
+        if (!roomId) {
+          return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+        }
 
-    });
+        return callback({
+          success: true,
+          message: "Detalhes da sala",
+          players: rooms[roomId].players
+        });
+      }
+    );
 
   });
 }

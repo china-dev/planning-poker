@@ -18,12 +18,6 @@ log.txt
 .env.local
 .env.*.local
 
-# Docker
-**/Dockerfile
-**/docker-compose.yml
-**/docker-compose.*.yml
-**/.docker/
-
 # Vite
 .vite/
 

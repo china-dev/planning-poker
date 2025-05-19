@@ -1,55 +1,62 @@
-import { onMounted } from 'vue';
+import { computed } from 'vue';
 import socket from '../services/socket.ts';
 import { useUserStore } from '../store/user.ts';
 
-export function useConnection () {
+export function useConnection() {
   const userStore = useUserStore();
-  const roomId:string = userStore.roomId;
+  const roomId = computed(() => userStore.roomId);
 
-  function connectServer () :void {
-    onMounted(() => {
-      socket.on('connect', () => {
-        userStore.setSocketId(socket.id);
-      });
+  function createServer () :void {
+    socket.connect();
+    
+    socket.on('connect', () => {
+      console.log('Socket conectado com id:', socket.id);
+      userStore.setSocketId(socket.id);
     });
-  }
-
-  function createRoom(
-    userName: string, roomName: string, roomId: string,
-    callback?: (response: any) => void
-  ): void {
   
-    socket.emit('createRoom', { userName, roomName, roomId }, (response: any) => {
-      console.log(response);
-      if (callback) callback(response);
+    socket.on('connect_error', (err) => {
+      console.error('Erro ao conectar socket:', err.message);
     });
   }
 
-  function joinedPlayer(
-    userName: string, roomId:string, isSpectator: boolean,
-    callback?: (response: any) => void
-  ): void {
-      socket.emit('joinedPlayer', { userName, roomId, isSpectator }, (response: any) => {
-      console.log(response);
-      if (callback) callback(response);
-    });
+  function disconnectServer () :void {
+    socket.off('connect');
+    socket.off('playerVoted');
+    socket.disconnect();
   }
 
-  function votePlayer (vote: number,  callback?: (response: any) => void):void {
-    socket.emit('votePlayer', {roomId, vote}, (response: any) => {
-      console.log(response);
-      if (callback) callback(response);
-    });
+  function createRoom(userName: string, nameRoom: string, roomId: string, callback?: (response: any) => void) {
+    socket.emit('createRoom', { userName, roomName: nameRoom, roomId }, callback);
   }
 
-  function getPlayers(callback?: (response: any) => void): void {
-
-    socket.emit('getPlayers', roomId, (response: any) => {
-      console.log(response);
-      if (callback) callback(response);
-    });
-
+  function joinedPlayer(userName: string, roomId: string, isSpectator: boolean, callback?: (response: any) => void) {
+    socket.emit('joinedPlayer', { userName, roomId, isSpectator }, callback);
   }
 
-  return { connectServer, createRoom, joinedPlayer, votePlayer, getPlayers }
+  function votePlayer(vote: number, callback?: (response: any) => void) {
+    socket.emit('votePlayer', { roomId: roomId.value, vote }, callback);
+  }
+
+  function getPlayers(callback?: (response: any) => void) {
+    socket.emit('getPlayers', roomId.value, callback);
+  }
+
+  function onPlayerVoted(callback: (data: { socketId: string; userName: string; vote: number }) => void) {
+    socket.on('playerVoted', callback);
+  }
+
+  function removePlayerVotedListener() {
+    socket.off('playerVoted');
+  }
+
+  return {
+    createServer,
+    disconnectServer,
+    createRoom,
+    joinedPlayer,
+    votePlayer,
+    getPlayers,
+    onPlayerVoted,
+    removePlayerVotedListener,
+  };
 }

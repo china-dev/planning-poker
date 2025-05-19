@@ -54,7 +54,6 @@ export function useFormHome () {
         }
       });
 
-      router.push(`/room/${roomId}`);
     }
   }
   

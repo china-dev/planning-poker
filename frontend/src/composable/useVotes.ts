@@ -1,10 +1,11 @@
+import { onMounted, onBeforeUnmount, computed } from 'vue';
 import { useUserStore } from '../store/user.ts';
 import { useConnection } from './useConnection.ts';
 
 
 
 export function useVotes () {
-  const { votePlayer, getPlayers } = useConnection();
+  const { votePlayer, getPlayers, onPlayerVoted, removePlayerVotedListener } = useConnection();
   const userStore = useUserStore();
   
   const fibonacci: number[] = [
@@ -12,13 +13,45 @@ export function useVotes () {
   ]
 
   function handleVote (userVote: number) :void {
-    userStore.setVote(userVote);
-    votePlayer(userVote);
+    votePlayer(userVote, (response) => {
+      if (!response.success) {
+        console.error('Erro ao votar:', response.message);
+      } else {
+        console.log('Voto registrado com sucesso!');
+        userStore.setVote(userVote);
+      }
+    });
   }
 
   function handlePlayers (): void {
-    getPlayers();
+    getPlayers((response) => {
+      if (!response.success) {
+        console.error('Erro ao mostrar players:', response.message);
+      } else {
+        userStore.setPlayers(response.players);
+      }
+    });
   }
 
-  return { fibonacci, handleVote, handlePlayers };
+  
+  function listenForVotes(): void {
+    onPlayerVoted((data) => {
+      console.log('Voto recebido:', data);
+      handlePlayers();
+    });
+  }
+
+  const filteredPlayers = computed(() => {
+    return Object.values(userStore.players).filter(player => player.vote !== undefined);
+  });
+
+  onMounted(() => {
+    listenForVotes();
+  });
+
+  onBeforeUnmount(() => {
+    removePlayerVotedListener();
+  });
+
+  return { fibonacci, handleVote, handlePlayers, filteredPlayers };
 }

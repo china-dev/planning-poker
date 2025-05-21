@@ -16,6 +16,7 @@ export function setupRooms(io: Server) {
   type Room = {
     roomName: string;
     players: Players;
+    voteReveal?: boolean;
   };
   
   const rooms: {
@@ -149,6 +150,33 @@ export function setupRooms(io: Server) {
           success: true,
           message: "Detalhes da sala",
           players: rooms[roomId].players
+        });
+      }
+    );
+
+    socket.on(
+      "voteRevelead",
+      (
+        roomId: string,
+        callback: (response: CallbackResponse) => void
+      ) => {
+
+        if (!roomId) {
+          return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+        }
+
+        rooms[roomId].voteReveal = true;
+
+        io.to(roomId).emit("onVoteRevelead", {
+          success: true,
+          socketId: socket.id,
+          message: "Votos revelados!!!"
+        });
+
+        return callback({
+          success: true,
+          message: "Votos revelados!!!",
+          room: rooms,
         });
       }
     );

@@ -1,10 +1,10 @@
 <script setup lang="ts">
   import { defineProps } from 'vue'
-  import { useUserStore } from '../../store/user'
-  import { useVotes } from '../../composable/useVotes'
+  import { useUserStore } from '../../store/user.ts'
+  import { useVotes } from '../../composable/useVotes.ts'
 
   const userStore = useUserStore()
-  const { handleVote } = useVotes()
+  const { handleVote, getSuitForPlayer } = useVotes()
 
   type Player = {
     userName: string;
@@ -24,34 +24,51 @@
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center mb-12">
+  <div class="flex flex-col items-center justify-center mb-12 mx-1 text-center text-wrap max-w-36">
     <div
-      @click="!isPlayer(value) && handleVote(value)"
       :class="[
+        'card-container',
+        isPlayer(value) && userStore.voteRevealed ? 'flipped' : '',
         isPlayer(value) ? 'cardClose' : '',
-        isPlayer(value) && value.vote === userStore.currentVote ? 'cardActive' : '',
-        !isPlayer(value) && userStore.currentVote === value ? 'cardActive' : '',
-        'hover:bg-blue-500',
-        'hover:text-white',
         'cursor-pointer',
-        'border',
-        'border-blue-500',
-        'border-solid',
         'rounded-md',
         'w-16',
         'h-24',
         'flex',
         'items-center',
         'justify-center',
-        'mx-2'
+        'mx-2',
       ]"
+      @click="!isPlayer(value) && handleVote(value)"
     >
-      <span class="font-bold text-2xl">
-        {{ isPlayer(value) ? value.vote ?? '?' : value }}
-      </span>
+      <!-- Frente: Naipe ou valor de voto -->
+      <div class="card-face front">
+        <span class="font-bold text-2xl">
+          {{
+            isPlayer(value)
+              ? getSuitForPlayer(value.userName)
+              : value
+          }}
+        </span>
+      </div>
+
+      <!-- Verso: Número votado -->
+      <div class="card-face back">
+        <span class="font-bold text-2xl">
+          {{
+            isPlayer(value)
+              ? value.vote ?? '?'
+              : value
+          }}
+        </span>
+      </div>
     </div>
     <p v-if="isPlayer(value)" class="font-bold text-2xl mt-1">
       {{ value.userName }}
     </p>
   </div>
 </template>
+
+<style scoped src="../../styles/card.css">
+
+</style>

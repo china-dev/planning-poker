@@ -14,6 +14,7 @@ export const useUserStore = defineStore('user', {
     socketId: null as string | null | undefined,
 		isAdmin: false,
 		isSpectator: false,
+		voteRevealed: false,
     currentVote: 0,
     players: []
 	}),
@@ -39,6 +40,9 @@ export const useUserStore = defineStore('user', {
     },
     setPlayers(players: []) {
       this.players = players;
+    },
+    setVoteRevealed(data: boolean) {
+      this.voteRevealed = data;
     }
 	}
 });

@@ -33,12 +33,12 @@ export function useConnection() {
     socket.emit('joinedPlayer', { userName, roomId, isSpectator }, callback);
   }
 
-  function votePlayer(vote: number, callback?: (response: any) => void) {
-    socket.emit('votePlayer', { roomId: roomId.value, vote }, callback);
-  }
-
   function getPlayers(callback?: (response: any) => void) {
     socket.emit('getPlayers', roomId.value, callback);
+  }
+
+  function votePlayer(vote: number, callback?: (response: any) => void) {
+    socket.emit('votePlayer', { roomId: roomId.value, vote }, callback);
   }
 
   function onPlayerVoted(callback: (data: { socketId: string; userName: string; vote: number }) => void) {
@@ -47,6 +47,18 @@ export function useConnection() {
 
   function removePlayerVotedListener() {
     socket.off('playerVoted');
+  }
+
+  function voteRevelead(callback?: (response: any) => void) {
+    socket.emit('voteRevelead', roomId.value, callback);
+  }
+
+  function onVoteRevelead(callback: (data: {success: boolean, socketId: string, message: string}) => void) {
+    socket.on('onVoteRevelead', callback);
+  }
+
+  function removeVoteReveleadListener() {
+    socket.off('onVoteRevelead');
   }
 
   return {
@@ -58,5 +70,8 @@ export function useConnection() {
     getPlayers,
     onPlayerVoted,
     removePlayerVotedListener,
+    voteRevelead,
+    onVoteRevelead,
+    removeVoteReveleadListener
   };
 }

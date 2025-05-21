@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { useFormHome } from "../../composable/UseFormHome.ts";
-  import { ref } from "vue";
+  import { ref, defineEmits } from "vue";
 
   const userName = ref<string>('');
   const nameRoom = ref<string>('');
@@ -11,13 +11,22 @@
     isAdmin: boolean
   }>();
 
+  const emit = defineEmits<{
+    (e: 'selectMode', modeSelected: boolean, isAdmin: boolean): void;
+  }>();
+
   const { handleCreateRoom, handleJoinRoom } = useFormHome();
-
-
 </script>
 
 <template>
   <div class="flex flex-col space-y-6 my-8">
+    <button
+      class="top-4 left-4 absolute flex items-center text-blue-500"
+      @click="emit('selectMode', false, false)"
+    >
+      <img src="../../assets/arrow_back.svg" alt="Voltar">
+       <span class="ml-2">Voltar</span>
+    </button>
     <input
       v-model="userName"
       placeholder="Seu nome"

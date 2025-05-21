@@ -18,7 +18,7 @@ function handleUserMode(mode:boolean, admin: boolean) {
     <div class="flex flex-col items-center justify-center h-screen space-y-10">
       <h1 class="text-3xl font-bold">♣️Planning Poker♦️</h1>
   
-      <div class="border border-blue-500 rounded-md px-10 py-8 w-[32rem]">
+      <div class="border border-blue-500 rounded-md px-10 py-8 w-[32rem] relative">
         <transition name="fade" mode="out-in">
           <ModalPosition
             v-if="!modeSelected"
@@ -27,6 +27,7 @@ function handleUserMode(mode:boolean, admin: boolean) {
           <FormPosition
             v-else
             :isAdmin="isAdmin"
+            @selectMode="handleUserMode"
           />
         </transition>
   

@@ -9,18 +9,14 @@
 </script>
 
 <template>
-  <main>
-    <HeaderRoom />
-    
-    <div>
+  <main class="flex flex-col justify-between">
+    <div class="fixed top-80">
       <pre>
-        {{  userStore }}
+        {{ userStore }}
       </pre>
     </div>
-
+    <HeaderRoom />
     <TableVotes />
-
-
     <VotesRoom
       v-if="!userStore.isSpectator"
     />

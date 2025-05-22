@@ -47,7 +47,7 @@ export function useFormHome () {
 
       joinedPlayer(userName, roomId, isSpectator, (response) => {
         if (response.success) {         
-          userStore.setUser(userName, response.room[roomId].roomName, roomId, false, isSpectator);
+          userStore.setUser(userName, response.room.roomName, roomId, false, isSpectator);
           router.push(`/room/${roomId}`);
         } else {
           alert(response.message);

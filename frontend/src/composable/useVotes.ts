@@ -10,10 +10,13 @@ export function useVotes () {
     removePlayerVotedListener,
     voteRevelead,
     onVoteRevelead,
-    removeVoteReveleadListener
+    removeVoteReveleadListener,
+    restartVote,
+    onVotesReset,
+    removeOnVotesReset
   } = useConnection();
+
   const userStore = useUserStore();
-  
   const fibonacci: number[] = [1, 2, 3, 5, 8, 13, 21];
   const suits = ['♥', '♦', '♣', '♠'];
   const playerSuits = reactive(new Map<string, string>());
@@ -78,9 +81,31 @@ export function useVotes () {
   function stopListeningReveal(): void {
     removeVoteReveleadListener();
   }
+  
+  function startOnVotesReset(): void {
+    onVotesReset((response) => {
+      userStore.setPlayers(response.players);
+      userStore.setVoteRevealed(false);
+    });
+  }
+
+  function stopRemoveOnVotesReset(): void {
+    removeOnVotesReset();
+  }
+
+  function handleRestartVote() {
+    restartVote((response: { success: boolean; message: string; players: any }) => {
+      userStore.setPlayers(response.players);
+      userStore.setVoteRevealed(false);
+    });
+  }
 
   const filteredPlayers = computed(() => {
     return Object.values(userStore.players).filter(player => player.vote !== undefined);
+  });
+
+  const dataVoteRevelead = computed(() => {
+    return userStore.voteRevealed
   });
 
   return {
@@ -93,6 +118,10 @@ export function useVotes () {
     startListeningVotes,
     stopListeningVotes,
     startListeningReveal,
-    stopListeningReveal
+    stopListeningReveal,
+    handleRestartVote,
+    startOnVotesReset,
+    stopRemoveOnVotesReset,
+    dataVoteRevelead
   };
 }

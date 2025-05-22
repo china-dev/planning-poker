@@ -1,55 +1,53 @@
 import { Server, Socket } from "socket.io";
 
 export function setupRooms(io: Server) {
-
   type Player = {
     userName: string;
     isAdmin: boolean;
     isSpectator?: boolean;
     vote?: number;
   };
-  
-  type Players = {
-    [socketId: string]: Player;
-  };
-  
+
+  type Players = Record<string, Player>;
+
   type Room = {
     roomName: string;
     players: Players;
     voteReveal?: boolean;
   };
-  
-  const rooms: {
-    [roomId: string]: Room;
-  } = {};
-  
-  type CallbackResponse = {
-    success: boolean;
-    message: string;
-    room?: typeof rooms;
-  };
-  
-  type CallbackResponseRoom = {
-    success: boolean;
-    message: string;
-    players?: Players;
+
+  const rooms: Record<string, Room> = {};
+
+  type RoomData = {
+    roomName: string;
+    players: Players;
+    voteReveal?: boolean;
   };
 
-  io.on('connection', (socket: Socket) => {
-    console.log(`New connection: ${socket.id}`);
+  type CallbackResponse =
+    | { success: true; message: string; room: RoomData }
+    | { success: false; message: string };
 
+  type CallbackPlayers =
+    | { success: true; message: string; players: Players }
+    | { success: false; message: string };
+
+  io.on("connection", (socket: Socket) => {
+    console.log(`🔌 New connection: ${socket.id}`);
+
+    // Criar uma nova sala
     socket.on(
-      'createRoom',
+      "createRoom",
       (
-        data: { userName: string, roomName: string, roomId: string },
+        data: { userName: string; roomName: string; roomId: string },
         callback: (response: CallbackResponse) => void
       ) => {
         const { userName, roomName, roomId } = data;
-      
+
         if (rooms[roomId]) {
-          return callback({ success: false, message: 'Sala já existe.' });
+          return callback({ success: false, message: "Sala já existe." });
         }
-      
+
         rooms[roomId] = {
           roomName,
           players: {
@@ -60,16 +58,17 @@ export function setupRooms(io: Server) {
           }
         };
 
-
         socket.join(roomId);
-      
+
         return callback({
           success: true,
-          message: 'Room created successfully.',
-          room: rooms
+          message: "Sala criada com sucesso.",
+          room: rooms[roomId]
         });
-    });
+      }
+    );
 
+    // Jogador entra em uma sala
     socket.on(
       "joinedPlayer",
       (
@@ -77,14 +76,13 @@ export function setupRooms(io: Server) {
         callback: (response: CallbackResponse) => void
       ) => {
         const { userName, roomId, isSpectator } = data;
-
         const room = rooms[roomId];
-        
+
         if (!room) {
           return callback({ success: false, message: "Sala não encontrada." });
         }
 
-        rooms[roomId].players[socket.id] = {
+        room.players[socket.id] = {
           userName,
           isAdmin: false,
           isSpectator
@@ -95,28 +93,32 @@ export function setupRooms(io: Server) {
         return callback({
           success: true,
           message: "Entrou na sala com sucesso.",
-          room: rooms,
+          room
         });
       }
     );
 
+    // Jogador envia um voto
     socket.on(
       "votePlayer",
       (
-        data: {roomId: string, vote: number},
+        data: { roomId: string; vote: number },
         callback: (response: CallbackResponse) => void
       ) => {
-
         const { roomId, vote } = data;
         const room = rooms[roomId];
-        const player = room?.players[socket.id];
+        const player = room?.players?.[socket.id];
 
         if (!room) {
           return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
         }
-    
+
         if (!player) {
-          return callback({ success: false, message: `Jogador não está na sala ${roomId}.` });
+          return callback({ success: false, message: `Jogador não está na sala.` });
+        }
+
+        if (player.isSpectator) {
+          return callback({ success: false, message: "Espectadores não podem votar." });
         }
 
         player.vote = vote;
@@ -124,62 +126,103 @@ export function setupRooms(io: Server) {
         io.to(roomId).emit("playerVoted", {
           socketId: socket.id,
           userName: player.userName,
-          vote,
+          vote
         });
 
         return callback({
           success: true,
-          message: "Voto registrado!!",
-          room: rooms,
+          message: "Voto registrado.",
+          room
         });
       }
     );
 
-    socket.on(
-      "getPlayers",
-      (
-        roomId: string,
-        callback: (response: CallbackResponseRoom) => void
-      ) => {
+    // Retorna os jogadores da sala
+    socket.on("getPlayers", (roomId: string, callback: (response: CallbackPlayers) => void) => {
+      const room = rooms[roomId];
 
-        if (!roomId) {
-          return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+      if (!room) {
+        return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+      }
+
+      return callback({
+        success: true,
+        message: "Lista de jogadores.",
+        players: room.players
+      });
+    });
+
+    // Revelar votos
+    socket.on("voteRevelead", (roomId: string, callback: (response: CallbackResponse) => void) => {
+      const room = rooms[roomId];
+
+      if (!room) {
+        return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+      }
+
+      room.voteReveal = true;
+
+      io.to(roomId).emit("onVoteRevelead", {
+        success: true,
+        socketId: socket.id,
+        message: "Votos revelados!"
+      });
+
+      return callback({
+        success: true,
+        message: "Votos revelados.",
+        room
+      });
+    });
+
+    // Reiniciar votação
+    socket.on("restartVote", (roomId: string, callback: (response: CallbackPlayers) => void) => {
+      const room = rooms[roomId];
+
+      if (!room) {
+        return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+      }
+
+      Object.values(room.players).forEach(player => {
+        if (player.vote !== undefined) {
+          delete player.vote;
         }
+      });
 
-        return callback({
-          success: true,
-          message: "Detalhes da sala",
-          players: rooms[roomId].players
-        });
-      }
-    );
+      io.to(roomId).emit("onVotesReset", {
+        success: true,
+        players: room.players,
+        message: "Todos os votos foram removidos.",
+      });
 
-    socket.on(
-      "voteRevelead",
-      (
-        roomId: string,
-        callback: (response: CallbackResponse) => void
-      ) => {
+      return callback({
+        success: true,
+        message: "Todos os votos foram removidos.",
+        players: room.players
+      });
+    });
 
-        if (!roomId) {
-          return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+    // Desconectar e limpar jogador da sala
+    socket.on("disconnect", () => {
+      for (const roomId in rooms) {
+        const room = rooms[roomId];
+
+        if (room.players[socket.id]) {
+          delete room.players[socket.id];
+
+          if (Object.keys(room.players).length === 0) {
+            delete rooms[roomId];
+          } else {
+            io.to(roomId).emit("playerDisconnected", {
+              socketId: socket.id
+            });
+          }
+
+          break;
         }
-
-        rooms[roomId].voteReveal = true;
-
-        io.to(roomId).emit("onVoteRevelead", {
-          success: true,
-          socketId: socket.id,
-          message: "Votos revelados!!!"
-        });
-
-        return callback({
-          success: true,
-          message: "Votos revelados!!!",
-          room: rooms,
-        });
       }
-    );
 
+      console.log(`❌ Disconnected: ${socket.id}`);
+    });
   });
 }

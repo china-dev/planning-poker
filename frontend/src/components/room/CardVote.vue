@@ -24,13 +24,12 @@
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center mb-12 mx-1 text-center text-wrap max-w-36">
+  <div class="flex flex-col items-center justify-center mx-1 text-center text-wrap max-w-36">
     <div
       :class="[
         'card-container',
         isPlayer(value) && userStore.voteRevealed ? 'flipped' : '',
         isPlayer(value) ? 'cardClose' : '',
-        'cursor-pointer',
         'rounded-md',
         'w-16',
         'h-24',

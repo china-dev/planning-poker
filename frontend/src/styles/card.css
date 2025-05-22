@@ -31,7 +31,11 @@
   transform: rotateY(180deg);
 }
 
-.card-face.front:hover {
+.cardVotes .card-face.front:hover {
   background-color: #3b82f6;
   color: white;
 }
+.cardVotes .card-face {
+  cursor: pointer;
+}
+

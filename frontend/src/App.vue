@@ -18,13 +18,7 @@ import { onMounted, onBeforeUnmount } from 'vue';
 </script>
 
 <template>
-  <div>
-    <div>
-      {{ userStore.socketId }}
-      <h1>Status: {{ userStore.socketId ? '🟢 Conectado' : '🔴 Desconectado' }}</h1>
-    </div>
-    <router-view />
-  </div>
+  <router-view />
 </template>
 
 <style scoped>

@@ -61,6 +61,19 @@ export function useConnection() {
     socket.off('onVoteRevelead');
   }
 
+  function restartVote(callback?: (response: any) => void) {
+    socket.emit('restartVote', roomId.value, callback);
+  }
+
+  function onVotesReset(callback: (data: {success: boolean, message: string, players: any}) => void) {
+    socket.on('onVotesReset', callback);
+  }
+
+  function removeOnVotesReset() {
+    socket.off('onVotesReset');
+  }
+
+
   return {
     createServer,
     disconnectServer,
@@ -72,6 +85,9 @@ export function useConnection() {
     removePlayerVotedListener,
     voteRevelead,
     onVoteRevelead,
-    removeVoteReveleadListener
+    removeVoteReveleadListener,
+    restartVote,
+    onVotesReset,
+    removeOnVotesReset
   };
 }

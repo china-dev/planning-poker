@@ -2,6 +2,7 @@
   import { onMounted, onBeforeUnmount } from 'vue';
   import { useConnection } from './composable/useConnection';
   import AlertMessages from './components/common/AlertMessages.vue';
+  import FooterBar from './components/common/FooterBar.vue';
 
   const { createServer, disconnectServer} = useConnection();
 
@@ -16,8 +17,11 @@
 </script>
 
 <template>
-  <router-view />
-  <AlertMessages />
+  <div class="wrapContentPage bg-blue-50">
+    <router-view />
+    <AlertMessages />
+    <FooterBar />
+  </div>
 </template>
 
 <style scoped>

@@ -10,7 +10,7 @@
 </script>
 
 <template>
-  <main class="flex flex-col justify-between">
+  <main class="flex flex-col justify-between h-full">
     <!-- <div class="fixed top-80">
       <pre>
         {{ userStore }}

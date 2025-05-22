@@ -22,7 +22,7 @@
   <aside class="fixed top-40 right-6">
     <TransitionGroup name="fade">
       <div v-for="player in players" :key="player.userName">
-        <p>🟢 {{ player.userName }} {{ getRoleEmoji(player) }}</p>
+        <p class="text-xl font-semibold">🟢 {{ player.userName }} {{ getRoleEmoji(player) }}</p>
       </div>
     </TransitionGroup>
   </aside>

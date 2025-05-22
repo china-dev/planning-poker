@@ -15,6 +15,7 @@
         :value="item.vote"
         :totalVotes="dataResultList.totalVotes"
         :qtdVotes="item.qtd"
+        class="cardResult"
       />
 
       <AvarageVote

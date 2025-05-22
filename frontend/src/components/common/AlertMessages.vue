@@ -24,7 +24,7 @@ watch(
       <div
         v-for="alert in store.alerts"
         :key="alert.id"
-        class="bg-gray-800 text-white px-4 py-2 rounded shadow-lg w-72 mb-4"
+        class="bg-white border border-solid border-blue-500 text-black px-4 py-2 text-center shadow-lg w-72 mb-4 rounded-full font-semibold"
       >
         {{ alert.text }}
       </div>

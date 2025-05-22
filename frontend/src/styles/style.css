@@ -115,13 +115,15 @@ h1, h2, h3 {
   opacity: 1;
 }
 
-body, #app, main {
+.wrapContentPage {
   height: 100vh;
-  overflow: hidden;
-}
-main {
-  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .wrapperCards {
   height: 168px;
+}
+.navRoom {
+  min-height: 104px;
 }

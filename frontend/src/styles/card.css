@@ -37,4 +37,6 @@
 .cardVotes .card-face {
   cursor: pointer;
 }
-
+.cardResult {
+  pointer-events: none;
+}

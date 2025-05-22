@@ -34,9 +34,20 @@ export function utils () {
     });
   }
 
+  function handleGetPlayers (): void {
+    getPlayers( response => {
+      if (response.success) {
+        players.value = Object.values(response.players);
+      }
+    })
+  }
+
   function handleOnPlayerDisconnect (): void {
     onPlayerDisconnect( (response) => {
+      console.log(response);
+      
       if (response.success) {
+        handleGetPlayers();
         setMessage({
           text: response.message,
           success: response.success
@@ -49,14 +60,6 @@ export function utils () {
     if (player.isAdmin) return '👑';
     if (player.isSpectator) return '👀';
     return '🎮';
-  }
-
-  function handleGetPlayers (): void {
-    getPlayers( response => {
-      if (response.success) {
-        players.value = Object.values(response.players);
-      }
-    })
   }
 
   return {

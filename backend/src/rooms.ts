@@ -216,19 +216,20 @@ export function setupRooms(io: Server) {
     socket.on("disconnect", () => {
       for (const roomId in rooms) {
         const room = rooms[roomId];
-        const userName = room.players[socket.id].userName;
-
+        
         if (room.players[socket.id]) {
+          const userName = room.players[socket.id].userName.length ? room.players[socket.id].userName : 'user';
           delete room.players[socket.id];
+          console.log('disparei')
+          io.to(roomId).emit("playerDisconnected", {
+              socketId: socket.id,
+              success: true,
+              message: getRandomAlertMessage('onDisconnect', userName),
+              room: rooms[roomId]
+          });
 
           if (Object.keys(room.players).length === 0) {
             delete rooms[roomId];
-          } else {
-            io.to(roomId).emit("playerDisconnected", {
-              socketId: socket.id,
-              message: getRandomAlertMessage('onDisconnect', userName),
-              room: rooms[roomId]
-            });
           }
 
           break;

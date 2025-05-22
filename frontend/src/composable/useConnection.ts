@@ -37,7 +37,9 @@ export function useConnection() {
     socket.on('onJoinedPlayer', callback);
   }
 
-  function onPlayerDisconnect(callback: (data: { success: boolean; message: string; room: any}) => void) {
+  function onPlayerDisconnect(callback: (data: { socketId: string; success: boolean; message: string; room: any}) => void) {
+    console.log("chamei o evento");
+    
     socket.on('playerDisconnected', callback);
   }
 

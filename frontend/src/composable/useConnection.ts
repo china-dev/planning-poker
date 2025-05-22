@@ -37,6 +37,9 @@ export function useConnection() {
     socket.on('onJoinedPlayer', callback);
   }
 
+  function onPlayerDisconnect(callback: (data: { success: boolean; message: string; room: any}) => void) {
+    socket.on('playerDisconnected', callback);
+  }
 
   function getPlayers(callback?: (response: any) => void) {
     socket.emit('getPlayers', roomId.value, callback);
@@ -94,6 +97,7 @@ export function useConnection() {
     removeVoteReveleadListener,
     restartVote,
     onVotesReset,
-    removeOnVotesReset
+    removeOnVotesReset,
+    onPlayerDisconnect
   };
 }

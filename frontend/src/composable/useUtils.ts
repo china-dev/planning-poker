@@ -6,7 +6,7 @@ import { useUserStore } from '../store/user.ts';
 export function utils () {
   const { setMessage } = useUserStore();
   
-  const { onJoinedPlayer, getPlayers } = useConnection();
+  const { onJoinedPlayer, getPlayers, onPlayerDisconnect } = useConnection();
   const players = ref([]);
 
   function invitePlayers (userName: string, roomName: string, roomId: string): void {
@@ -26,7 +26,17 @@ export function utils () {
     onJoinedPlayer( (response) => {
       if (response.success) {
         players.value = Object.values(response.players);
-        console.log(response);
+        setMessage({
+          text: response.message,
+          success: response.success
+        });
+      }
+    });
+  }
+
+  function handleOnPlayerDisconnect (): void {
+    onPlayerDisconnect( (response) => {
+      if (response.success) {
         setMessage({
           text: response.message,
           success: response.success
@@ -54,6 +64,7 @@ export function utils () {
     onPlayersJoined,
     players,
     getRoleEmoji,
-    handleGetPlayers
+    handleGetPlayers,
+    handleOnPlayerDisconnect
   }
 }

@@ -3,9 +3,7 @@
   import VotesRoom from '../components/room/VotesRoom.vue';
   import TableVotes from '../components/room/TableRoom.vue';
   import ListPlayers from '../components/room/ListPlayers.vue';
-  import { utils } from '../composable/useUtils.ts';
   import { useUserStore } from '../store/user.ts';
-  import { onMounted } from 'vue';
 
 
   const userStore = useUserStore();

@@ -122,3 +122,6 @@ body, #app, main {
 main {
   padding-bottom: 100px;
 }
+.wrapperCards {
+  height: 168px;
+}

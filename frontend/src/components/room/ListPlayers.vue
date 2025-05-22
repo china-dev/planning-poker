@@ -6,12 +6,14 @@
     onPlayersJoined,
     players,
     getRoleEmoji,
-    handleGetPlayers
+    handleGetPlayers,
+    handleOnPlayerDisconnect
   } = utils();
 
   onMounted(() => {
     handleGetPlayers();
     onPlayersJoined();
+    handleOnPlayerDisconnect();
   });
 
 </script>

@@ -1,12 +1,19 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import ResultVotes from '../components/room/ResultVotes.vue';
 
 
 type AlertMessage = {
   text: string;
   success: boolean;
-  id: number;
+  id?: number;
 };
+
+type ResultVotes = {
+  votes: {vote: number, qtd: number}[],
+  totalVotes: number,
+  avarage: number
+}
 
 let alertCounter = 0;
 
@@ -19,6 +26,7 @@ export const useUserStore = defineStore('user', {
 		isAdmin: false,
 		isSpectator: false,
 		voteRevealed: false,
+    resultVotes: {} as ResultVotes,
     currentVote: 0,
     alerts: [] as AlertMessage[],
     players: []
@@ -48,6 +56,12 @@ export const useUserStore = defineStore('user', {
     },
     setVoteRevealed(data: boolean) {
       this.voteRevealed = data;
+    },
+    setResultsVote(data: ResultVotes) {
+      this.resultVotes = data;
+    },
+    removeResultsVote(data: ResultVotes) {
+      this.resultVotes = data;
     },
     setMessage(data: AlertMessage) {
       this.alerts.push({

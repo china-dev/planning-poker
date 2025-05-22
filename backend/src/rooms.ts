@@ -216,6 +216,7 @@ export function setupRooms(io: Server) {
     socket.on("disconnect", () => {
       for (const roomId in rooms) {
         const room = rooms[roomId];
+        const userName = room.players[socket.id].userName;
 
         if (room.players[socket.id]) {
           delete room.players[socket.id];
@@ -224,7 +225,9 @@ export function setupRooms(io: Server) {
             delete rooms[roomId];
           } else {
             io.to(roomId).emit("playerDisconnected", {
-              socketId: socket.id
+              socketId: socket.id,
+              message: getRandomAlertMessage('onDisconnect', userName),
+              room: rooms[roomId]
             });
           }
 
@@ -234,5 +237,6 @@ export function setupRooms(io: Server) {
 
       console.log(`❌ Disconnected: ${socket.id}`);
     });
+
   });
 }

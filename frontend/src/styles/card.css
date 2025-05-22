@@ -20,14 +20,13 @@
   border-radius: 0.375rem;
 }
 
+.card-face.back,
 .card-face.front {
   background-color: white;
   color: black;
 }
 
 .card-face.back {
-  background-color: #3b82f6;
-  color: white;
   transform: rotateY(180deg);
 }
 

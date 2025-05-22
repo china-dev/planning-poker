@@ -17,5 +17,18 @@ export const alertMessages = {
     "🚀 {name} acabou de pousar na sala!",
     "⚡ {name} se conectou, segurem os votos!",
     "🔥 {name} chegou pronto pra votar!",
+  ],
+  onDisconnect: [
+    "🛟 {name} pulou do navio... esperamos que saiba nadar!",
+    "📡 {name} se desconectou. Suspeitamos que foi culpa do Wi-Fi.",
+    "🚪 {name} fugiu pela porta dos fundos... do servidor.",
+    "🪦 {name} foi desconectado. Um minuto de silêncio pela conexão perdida.",
+    "💻 {name} deu `exit()` no jogo.",
+    "🌌 {name} foi para a dimensão 404. Jogador não encontrado.",
+    "🤕 {name} caiu. Esperamos que tenha caído em algo macio.",
+    "👻 {name} saiu... deixou só saudade e pacote perdido.",
+    "☕ {name} desconectou. Provavelmente foi buscar um café.",
+    "🪲 {name} encontrou um bug e decidiu não ser parte da solução.",
+    "📉 {name} caiu. E não foi só a conexão.",
   ]
 };

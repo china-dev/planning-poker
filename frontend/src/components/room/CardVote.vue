@@ -3,7 +3,7 @@
   import { useUserStore } from '../../store/user.ts'
   import { useVotes } from '../../composable/useVotes.ts'
 
-  const userStore = useUserStore()
+  const userStore = useUserStore();
   const { handleVote, getSuitForPlayer } = useVotes()
 
   type Player = {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount } from 'vue';
+  import { onMounted, onBeforeUnmount } from 'vue';
   import { useConnection } from './composable/useConnection';
-  import { useUserStore } from "./store/user.ts";
+  import AlertMessages from './components/common/AlertMessages.vue';
 
   const { createServer, disconnectServer} = useConnection();
 
@@ -13,12 +13,11 @@ import { onMounted, onBeforeUnmount } from 'vue';
     disconnectServer();
   });
   
-  const userStore = useUserStore();
-
 </script>
 
 <template>
   <router-view />
+  <AlertMessages />
 </template>
 
 <style scoped>

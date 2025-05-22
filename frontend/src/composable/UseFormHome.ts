@@ -41,6 +41,9 @@ export function useFormHome () {
   function handleJoinRoom (userName: string, roomId: string, isSpectator: boolean): void {
     const result = validade(userName, roomId);
 
+    userName = userName.trim();
+    roomId = roomId.trim();
+
     if (result.error === true) {
       alert(result.message);
     } else {
@@ -59,7 +62,10 @@ export function useFormHome () {
   
   function handleCreateRoom (userName: string, nameRoom: string): void {
     const result = validade(userName, nameRoom);
-    const roomId = generateRoomId();
+    let roomId = generateRoomId();
+
+    userName = userName.trim();
+    roomId = roomId.trim();
     
     if (result.error === true) {
       alert(result.message);

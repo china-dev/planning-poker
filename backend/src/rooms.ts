@@ -1,4 +1,7 @@
 import { Server, Socket } from "socket.io";
+import { utils } from "./utils/useUtils";
+
+const { getRandomAlertMessage } = utils();
 
 export function setupRooms(io: Server) {
   type Player = {
@@ -88,6 +91,12 @@ export function setupRooms(io: Server) {
           isSpectator
         };
 
+        io.to(roomId).emit("onJoinedPlayer", {
+          success: true,
+          message: getRandomAlertMessage('onJoin', userName),
+          players: room.players
+        });
+
         socket.join(roomId);
 
         return callback({
@@ -125,6 +134,7 @@ export function setupRooms(io: Server) {
 
         io.to(roomId).emit("playerVoted", {
           socketId: socket.id,
+          message: getRandomAlertMessage('onVote', player.userName),
           userName: player.userName,
           vote
         });

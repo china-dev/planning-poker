@@ -33,6 +33,11 @@ export function useConnection() {
     socket.emit('joinedPlayer', { userName, roomId, isSpectator }, callback);
   }
 
+  function onJoinedPlayer(callback: (data: { success: boolean; message: string; players: any}) => void) {
+    socket.on('onJoinedPlayer', callback);
+  }
+
+
   function getPlayers(callback?: (response: any) => void) {
     socket.emit('getPlayers', roomId.value, callback);
   }
@@ -41,7 +46,7 @@ export function useConnection() {
     socket.emit('votePlayer', { roomId: roomId.value, vote }, callback);
   }
 
-  function onPlayerVoted(callback: (data: { socketId: string; userName: string; vote: number }) => void) {
+  function onPlayerVoted(callback: (data: { socketId: string; message: string; userName: string; vote: number }) => void) {
     socket.on('playerVoted', callback);
   }
 
@@ -79,6 +84,7 @@ export function useConnection() {
     disconnectServer,
     createRoom,
     joinedPlayer,
+    onJoinedPlayer,
     votePlayer,
     getPlayers,
     onPlayerVoted,

@@ -1,4 +1,13 @@
+import { ref } from "vue";
+import { useConnection } from "./useConnection";
+import { useUserStore } from '../store/user.ts';
+
+
 export function utils () {
+  const { setMessage } = useUserStore();
+  
+  const { onJoinedPlayer, getPlayers } = useConnection();
+  const players = ref([]);
 
   function invitePlayers (userName: string, roomName: string, roomId: string): void {
     const message = `${userName} convidou para participar do Planning Poker: ${roomName}!!!\nAcesse https://planingpokerapp.com e insira o ID da sala: ${roomId} ou clique no link direto: https://planingpokerapp.com/room/${roomId}`;
@@ -13,7 +22,38 @@ export function utils () {
     });
   }
 
+  function onPlayersJoined (): void {
+    onJoinedPlayer( (response) => {
+      if (response.success) {
+        players.value = Object.values(response.players);
+        console.log(response);
+        setMessage({
+          text: response.message,
+          success: response.success
+        });
+      }
+    });
+  }
+
+  function getRoleEmoji(player: any): string {
+    if (player.isAdmin) return '👑';
+    if (player.isSpectator) return '👀';
+    return '🎮';
+  }
+
+  function handleGetPlayers (): void {
+    getPlayers( response => {
+      if (response.success) {
+        players.value = Object.values(response.players);
+      }
+    })
+  }
+
   return {
-    invitePlayers
+    invitePlayers,
+    onPlayersJoined,
+    players,
+    getRoleEmoji,
+    handleGetPlayers
   }
 }

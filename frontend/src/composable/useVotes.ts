@@ -42,8 +42,12 @@ export function useVotes () {
   }
 
   function startListeningVotes(): void {
-    onPlayerVoted(() => {
+    onPlayerVoted((response) => {
       handlePlayers();
+      userStore.setMessage({
+          text: response.message,
+          success: true
+        });
     });
   }
 

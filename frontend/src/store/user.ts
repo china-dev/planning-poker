@@ -1,10 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-type userVote = {
-  userName: string;
-  vote: number | null;
+
+type AlertMessage = {
+  text: string;
+  success: boolean;
+  id: number;
 };
+
+let alertCounter = 0;
 
 export const useUserStore = defineStore('user', {
 	state: () => ({
@@ -16,6 +20,7 @@ export const useUserStore = defineStore('user', {
 		isSpectator: false,
 		voteRevealed: false,
     currentVote: 0,
+    alerts: [] as AlertMessage[],
     players: []
 	}),
 	actions: {
@@ -43,6 +48,16 @@ export const useUserStore = defineStore('user', {
     },
     setVoteRevealed(data: boolean) {
       this.voteRevealed = data;
+    },
+    setMessage(data: AlertMessage) {
+      this.alerts.push({
+        id: alertCounter++,
+        text: data.text,
+        success: data.success
+      });
+    },
+    removeMessage(id: number) {
+      this.alerts = this.alerts.filter((msg) => msg.id !== id);
     }
 	}
 });

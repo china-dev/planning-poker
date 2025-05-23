@@ -43,6 +43,7 @@
           'card-container',
           isPlayer(value) && userStore.voteRevealed ? 'flipped' : '',
           isPlayer(value) ? 'cardClose' : '',
+          value === userStore.currentVote ? 'cardActive' : '',
           'rounded-md',
           'w-16',
           'h-24',

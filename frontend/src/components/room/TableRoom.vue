@@ -3,7 +3,7 @@
   import Card from './CardVote.vue';
 
   const {
-    filteredPlayers
+    playersWithVotes
   } = useVotes();
 
 </script>
@@ -18,7 +18,7 @@
         tag="div"
       >
         <Card
-          v-for="(item, index) in filteredPlayers"
+          v-for="(item, index) in playersWithVotes"
           :key="index"
           :value="item"
           class="cardTable"

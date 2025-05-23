@@ -1,19 +1,19 @@
 <script setup lang="ts">
-  import { utils } from '../../composable/useUtils.ts';
+  import { useUtils } from '../../composable/useUtils.ts';
   import { onMounted } from 'vue';
 
   const {
-    onPlayersJoined,
+    startListeningPlayerJoin,
     players,
     getRoleEmoji,
     handleGetPlayers,
-    handleOnPlayerDisconnect
-  } = utils();
+    startListeningPlayerDisconnect
+  } = useUtils();
 
   onMounted(() => {
     handleGetPlayers();
-    onPlayersJoined();
-    handleOnPlayerDisconnect();
+    startListeningPlayerJoin();
+    startListeningPlayerDisconnect();
   });
 
 </script>

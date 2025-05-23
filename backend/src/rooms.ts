@@ -3,129 +3,136 @@ import { utils } from "./utils/useUtils";
 
 const { getRandomAlertMessage } = utils();
 
+type Player = {
+  userId: string;
+  userName: string;
+  isAdmin: boolean;
+  isSpectator?: boolean;
+  vote?: number;
+};
+
+type Players = Record<string, Player>;
+
+type Room = {
+  roomName: string;
+  players: Players;
+  voteReveal?: boolean;
+};
+
+type CallbackResponse =
+  | { success: true; message: string; room: Room }
+  | { success: false; message: string };
+
+type CallbackPlayers =
+  | { success: true; message: string; players: Players }
+  | { success: false; message: string };
+
+const rooms: Record<string, Room> = {};
+const userSocketMap = new Map<string, string>(); // userId -> socket.id
+const disconnectTimeouts = new Map<string, NodeJS.Timeout>(); // userId -> timeout
+
 export function setupRooms(io: Server) {
-  type Player = {
-    userName: string;
-    isAdmin: boolean;
-    isSpectator?: boolean;
-    vote?: number;
-  };
-
-  type Players = Record<string, Player>;
-
-  type Room = {
-    roomName: string;
-    players: Players;
-    voteReveal?: boolean;
-  };
-
-  const rooms: Record<string, Room> = {};
-
-  type RoomData = {
-    roomName: string;
-    players: Players;
-    voteReveal?: boolean;
-  };
-
-  type CallbackResponse =
-    | { success: true; message: string; room: RoomData }
-    | { success: false; message: string };
-
-  type CallbackPlayers =
-    | { success: true; message: string; players: Players }
-    | { success: false; message: string };
-
   io.on("connection", (socket: Socket) => {
-    console.log(`🔌 New connection: ${socket.id}`);
+    console.log(`🔌 Connected: ${socket.id}`);
 
-    // Criar uma nova sala
+    const mapUserToSocket = (userId: string, socketId: string) => {
+      userSocketMap.set(userId, socketId);
+    };
+
+    const clearDisconnectTimeout = (userId: string) => {
+      const timeout = disconnectTimeouts.get(userId);
+      if (timeout) {
+        clearTimeout(timeout);
+        disconnectTimeouts.delete(userId);
+      }
+    };
+
     socket.on(
       "createRoom",
       (
-        data: { userName: string; roomName: string; roomId: string },
+        { userId, userName, roomId, roomName }: { userId: string; userName: string; roomId: string; roomName: string },
         callback: (response: CallbackResponse) => void
       ) => {
-        const { userName, roomName, roomId } = data;
-
         if (rooms[roomId]) {
           return callback({ success: false, message: "Sala já existe." });
         }
 
-        rooms[roomId] = {
+        const room: Room = {
           roomName,
           players: {
-            [socket.id]: {
+            [userId]: {
+              userId,
               userName,
-              isAdmin: true
-            }
-          }
+              isAdmin: true,
+            },
+          },
+          voteReveal: false,
         };
 
+        rooms[roomId] = room;
+        mapUserToSocket(userId, socket.id);
+        clearDisconnectTimeout(userId);
         socket.join(roomId);
 
-        return callback({
+        callback({
           success: true,
           message: "Sala criada com sucesso.",
-          room: rooms[roomId]
+          room,
         });
       }
     );
 
-    // Jogador entra em uma sala
     socket.on(
       "joinedPlayer",
       (
-        data: { userName: string; roomId: string; isSpectator: boolean },
+        { userId, userName, roomId, isSpectator }: { userId: string; userName: string; roomId: string; isSpectator: boolean },
         callback: (response: CallbackResponse) => void
       ) => {
-        const { userName, roomId, isSpectator } = data;
         const room = rooms[roomId];
-
         if (!room) {
           return callback({ success: false, message: "Sala não encontrada." });
         }
 
-        room.players[socket.id] = {
+        room.players[userId] = {
+          userId,
           userName,
           isAdmin: false,
-          isSpectator
+          isSpectator,
         };
+
+        mapUserToSocket(userId, socket.id);
+        clearDisconnectTimeout(userId);
+        socket.join(roomId);
 
         io.to(roomId).emit("onJoinedPlayer", {
           success: true,
-          message: getRandomAlertMessage('onJoin', userName),
-          players: room.players
+          message: getRandomAlertMessage("onJoin", userName),
+          players: room.players,
         });
 
-        socket.join(roomId);
-
-        return callback({
+        callback({
           success: true,
           message: "Entrou na sala com sucesso.",
-          room
+          room,
         });
       }
     );
 
-    // Jogador envia um voto
     socket.on(
       "votePlayer",
       (
-        data: { roomId: string; vote: number },
+        { roomId, vote, userId }: { roomId: string; vote: number; userId: string },
         callback: (response: CallbackResponse) => void
       ) => {
-        const { roomId, vote } = data;
         const room = rooms[roomId];
-        const player = room?.players?.[socket.id];
+        const player = room?.players?.[userId];
 
         if (!room) {
           return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
         }
-
         if (!player) {
-          return callback({ success: false, message: `Jogador não está na sala.` });
+          return callback({ success: false, message: "Jogador não está na sala." });
         }
-
         if (player.isSpectator) {
           return callback({ success: false, message: "Espectadores não podem votar." });
         }
@@ -133,37 +140,42 @@ export function setupRooms(io: Server) {
         player.vote = vote;
 
         io.to(roomId).emit("playerVoted", {
-          socketId: socket.id,
-          message: getRandomAlertMessage('onVote', player.userName),
+          userId,
           userName: player.userName,
-          vote
+          vote,
+          message: getRandomAlertMessage("onVote", player.userName),
         });
 
-        return callback({
+        callback({
           success: true,
           message: "Voto registrado.",
-          room
+          room,
         });
       }
     );
 
-    // Retorna os jogadores da sala
     socket.on("getPlayers", (roomId: string, callback: (response: CallbackPlayers) => void) => {
       const room = rooms[roomId];
+      
+      console.log('to aqui', roomId);
+
+      if (!callback || typeof callback !== 'function') {
+        console.warn(`Callback não fornecido para getPlayers na sala ${roomId}`);
+        return;
+      }
 
       if (!room) {
         return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
       }
 
-      return callback({
+      callback({
         success: true,
         message: "Lista de jogadores.",
-        players: room.players
+        players: room.players,
       });
     });
 
-    // Revelar votos
-    socket.on("voteRevelead", (roomId: string, callback: (response: CallbackResponse) => void) => {
+    socket.on("voteRevealed", (roomId: string, callback: (response: CallbackResponse) => void) => {
       const room = rooms[roomId];
 
       if (!room) {
@@ -172,20 +184,18 @@ export function setupRooms(io: Server) {
 
       room.voteReveal = true;
 
-      io.to(roomId).emit("onVoteRevelead", {
+      io.to(roomId).emit("onVoteRevealed", {
         success: true,
-        socketId: socket.id,
-        message: "Votos revelados!"
+        message: "Votos revelados!",
       });
 
-      return callback({
+      callback({
         success: true,
         message: "Votos revelados.",
-        room
+        room,
       });
     });
 
-    // Reiniciar votação
     socket.on("restartVote", (roomId: string, callback: (response: CallbackPlayers) => void) => {
       const room = rooms[roomId];
 
@@ -193,11 +203,11 @@ export function setupRooms(io: Server) {
         return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
       }
 
-      Object.values(room.players).forEach(player => {
-        if (player.vote !== undefined) {
-          delete player.vote;
-        }
+      Object.values(room.players).forEach((player) => {
+        delete player.vote;
       });
+
+      room.voteReveal = false;
 
       io.to(roomId).emit("onVotesReset", {
         success: true,
@@ -205,39 +215,50 @@ export function setupRooms(io: Server) {
         message: "Todos os votos foram removidos.",
       });
 
-      return callback({
+      callback({
         success: true,
-        message: "Todos os votos foram removidos.",
-        players: room.players
+        message: "Votos resetados.",
+        players: room.players,
       });
     });
 
-    // Desconectar e limpar jogador da sala
     socket.on("disconnect", () => {
-      for (const roomId in rooms) {
-        const room = rooms[roomId];
-        
-        if (room.players[socket.id]) {
-          const userName = room.players[socket.id].userName.length ? room.players[socket.id].userName : 'user';
-          delete room.players[socket.id];
-          console.log('disparei')
-          io.to(roomId).emit("playerDisconnected", {
-              socketId: socket.id,
-              success: true,
-              message: getRandomAlertMessage('onDisconnect', userName),
-              room: rooms[roomId]
-          });
+      const userId = [...userSocketMap.entries()].find(([_, sid]) => sid === socket.id)?.[0];
 
-          if (Object.keys(room.players).length === 0) {
-            delete rooms[roomId];
-          }
-
-          break;
-        }
+      if (!userId) {
+        console.log(`❌ Disconnected: ${socket.id} (userId desconhecido)`);
+        return;
       }
 
-      console.log(`❌ Disconnected: ${socket.id}`);
-    });
+      const timeout = setTimeout(() => {
+        for (const roomId in rooms) {
+          const room = rooms[roomId];
 
+          if (room.players[userId]) {
+            const userName = room.players[userId].userName || "Jogador";
+            delete room.players[userId];
+            userSocketMap.delete(userId);
+
+            io.to(roomId).emit("playerDisconnected", {
+              success: true,
+              userId,
+              message: getRandomAlertMessage("onDisconnect", userName),
+              room,
+            });
+
+            if (Object.keys(room.players).length === 0) {
+              delete rooms[roomId];
+            }
+
+            break;
+          }
+        }
+        disconnectTimeouts.delete(userId);
+        console.log(`❌ Usuário ${userId} removido da sala após desconectar.`);
+      }, 7000); // Timeout de 5 segundos
+
+      disconnectTimeouts.set(userId, timeout);
+      console.log(`⚠️ Disconnected: ${socket.id} aguardando reconexão (userId: ${userId})`);
+    });
   });
 }

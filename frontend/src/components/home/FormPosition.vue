@@ -19,7 +19,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col space-y-6 my-8">
+  <form class="flex flex-col space-y-6 my-8" @submit.prevent="">
     <button
       class="top-4 left-4 absolute flex items-center text-blue-500"
       @click="emit('selectMode', false, false)"
@@ -28,6 +28,7 @@
        <span class="ml-2">Voltar</span>
     </button>
     <input
+      required="true"
       v-model="userName"
       placeholder="Seu nome"
       class="border-0 border-b border-b-blue-500 border-solid p-2 focus:outline-none"
@@ -35,6 +36,7 @@
 
     <input
       v-if="isAdmin"
+      required="true"
       v-model="nameRoom"
       placeholder="Nome da sala"
       class="border-0 border-b border-b-blue-500 border-solid p-2 focus:outline-none"
@@ -42,6 +44,7 @@
 
     <input
       v-if="!isAdmin"
+      required="true"
       v-model="roomId"
       placeholder="ID da sala"
       class="border-0 border-b border-b-blue-500 border-solid p-2 focus:outline-none"
@@ -97,11 +100,11 @@
     </button>
 
     <button
-      @click="handleJoinRoom(userName, roomId, isSpectator)"
+      @click="handleJoinRoom(userName, roomId, isSpectator, false)"
       v-if="!isAdmin"
       class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
     >
       Entrar
     </button>
-  </div>
+  </form>
 </template>

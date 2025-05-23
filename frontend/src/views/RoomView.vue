@@ -4,18 +4,26 @@
   import TableVotes from '../components/room/TableRoom.vue';
   import ListPlayers from '../components/room/ListPlayers.vue';
   import { useUserStore } from '../store/user.ts';
+  import { useConnection } from '../composable/useConnection.ts';
+  import { onBeforeUnmount } from "vue";
 
 
   const userStore = useUserStore();
+  const { removeListeners } = useConnection();
+
+
+  onBeforeUnmount(() => {
+    removeListeners();
+  });
 </script>
 
 <template>
   <main class="flex flex-col justify-between h-full">
-    <!-- <div class="fixed top-80">
+    <div class="fixed top-40">
       <pre>
         {{ userStore }}
       </pre>
-    </div> -->
+    </div>
     <ListPlayers />
     <HeaderRoom />
     <TableVotes />

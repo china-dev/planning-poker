@@ -14,8 +14,8 @@ function handleUserMode(mode:boolean, admin: boolean) {
 </script>
 
 <template>
-  <main class="flex flex-col items-center justify-center min-h-screen p-4">
-    <div class="flex flex-col items-center justify-center h-screen space-y-10">
+  <main class="flex flex-col items-center justify-center p-4 h-full">
+    <div class="flex flex-col items-center justify-center h-full space-y-10">
       <h1 class="text-3xl font-bold">♣️Planning Poker♦️</h1>
   
       <div class="border border-blue-500 rounded-md px-10 py-8 w-[32rem] relative">

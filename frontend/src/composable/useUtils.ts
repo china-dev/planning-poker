@@ -1,57 +1,68 @@
-import { ref } from "vue";
-import { useConnection } from "./useConnection";
+import { ref } from 'vue';
+import { useConnection } from './useConnection.ts';
 import { useUserStore } from '../store/user.ts';
 
-
-export function utils () {
-  const { setMessage } = useUserStore();
-  
+export function useUtils() {
+  const userStore = useUserStore();
   const { onJoinedPlayer, getPlayers, onPlayerDisconnect } = useConnection();
-  const players = ref([]);
 
-  function invitePlayers (userName: string, roomName: string, roomId: string): void {
-    const message = `${userName} convidou para participar do Planning Poker: ${roomName}!!!\nAcesse https://planingpokerapp.com e insira o ID da sala: ${roomId} ou clique no link direto: https://planingpokerapp.com/room/${roomId}`;
+  const players = ref<any[]>([]);
+
+  function invitePlayers(userName: string, roomName: string, roomId: string): void {
+    const message = 
+      `${userName} convidou você para participar do Planning Poker: ${roomName}!\n\n` + 
+      `Acesse: https://planingpokerapp.com\n` + 
+      `ID da sala: ${roomId}\n\n` + 
+      `Ou clique no link direto: https://planingpokerapp.com/room/${roomId}`;
 
     navigator.clipboard.writeText(message)
-    .then(() => {
-      console.log('Convite copiado para a área de transferência!');
-      alert('Convite copiado! Compartilhe com seus colegas.');
-    })
-    .catch((err) => {
-      console.error('Erro ao copiar convite:', err);
-    });
+      .then(() => {
+        alert('✅ Convite copiado! Compartilhe com seus colegas.');
+      })
+      .catch((err) => {
+        console.error('❌ Erro ao copiar convite:', err);
+      });
   }
 
-  function onPlayersJoined (): void {
-    onJoinedPlayer( (response) => {
+  function startListeningPlayerJoin(): void {
+    onJoinedPlayer((response) => {
       if (response.success) {
         players.value = Object.values(response.players);
-        setMessage({
+        userStore.setMessage({
           text: response.message,
-          success: response.success
+          success: true
         });
+      } else {
+        console.error('❌ Erro ao receber entrada de jogador:', response.message);
       }
     });
   }
 
-  function handleGetPlayers (): void {
-    getPlayers( response => {
+  function handleGetPlayers(): void {
+
+    console.log('RoomId da store', userStore.roomId);
+    console.log('RoomID da session', sessionStorage.getItem('planningPokerSession'));
+    
+    
+    getPlayers((response) => {
       if (response.success) {
         players.value = Object.values(response.players);
+      } else {
+        console.error('❌ Erro ao obter jogadores:', response.message);
       }
-    })
+    });
   }
 
-  function handleOnPlayerDisconnect (): void {
-    onPlayerDisconnect( (response) => {
-      console.log(response);
-      
+  function startListeningPlayerDisconnect(): void {
+    onPlayerDisconnect((response) => {
       if (response.success) {
         handleGetPlayers();
-        setMessage({
+        userStore.setMessage({
           text: response.message,
-          success: response.success
+          success: true
         });
+      } else {
+        console.error('❌ Erro ao processar desconexão:', response.message);
       }
     });
   }
@@ -64,10 +75,10 @@ export function utils () {
 
   return {
     invitePlayers,
-    onPlayersJoined,
     players,
     getRoleEmoji,
     handleGetPlayers,
-    handleOnPlayerDisconnect
-  }
+    startListeningPlayerJoin,
+    startListeningPlayerDisconnect
+  };
 }

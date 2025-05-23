@@ -1,37 +1,28 @@
 <script setup lang="ts">
   import { onMounted, onBeforeUnmount } from 'vue';
   import { useUserStore } from '../../store/user.ts';
-  import { utils } from '../../composable/useUtils.ts';
+  import { useUtils } from '../../composable/useUtils.ts';
   import { useVotes } from '../../composable/useVotes.ts';
 
   const {userName, nameRoom, isAdmin, roomId } = useUserStore();
-  const { invitePlayers } = utils();
+  const { invitePlayers } = useUtils();
 
   const {
     handlePlayers,
-    filteredPlayers,
-    revealVotes,
-    startListeningVotes,
-    stopListeningVotes,
-    startListeningReveal,
-    stopListeningReveal,
+    playersWithVotes,
+    handleRevealVotes,
+    listenVotes,
+    listenReveal,
     handleRestartVote,
-    startOnVotesReset,
-    stopRemoveOnVotesReset,
-    dataVoteRevelead
+    listenReset,
+    voteRevealedState
   } = useVotes();
 
   onMounted(() => {
     handlePlayers();
-    startListeningVotes();
-    startListeningReveal();
-    startOnVotesReset();
-  });
-
-  onBeforeUnmount(() => {
-    stopListeningVotes();
-    stopListeningReveal();
-    stopRemoveOnVotesReset();
+    listenVotes();
+    listenReveal();
+    listenReset();
   });
 </script>
 
@@ -41,10 +32,10 @@
     <div class="flex justify-center items-center">
       <button
         v-if="isAdmin"
-        :disabled="!filteredPlayers.length"
-        @click="filteredPlayers.length ? revealVotes() : null"
+        :disabled="!playersWithVotes.length"
+        @click="playersWithVotes.length ? handleRevealVotes() : null"
         :class="[
-          !filteredPlayers.length ? 'cursor-not-allowed opacity-50' : '',
+          !playersWithVotes.length ? 'cursor-not-allowed opacity-50' : '',
           'p-3 bg-blue-500 text-white rounded-lg w-40 hover:bg-blue-600 font-bold mr-5'
         ]"
       >
@@ -52,10 +43,10 @@
       </button>
       <button
         v-if="isAdmin"
-        :disabled="!dataVoteRevelead"
+        :disabled="!voteRevealedState"
         @click="handleRestartVote"
         :class="[
-          !dataVoteRevelead ? 'cursor-not-allowed opacity-50' : '',
+          !voteRevealedState ? 'cursor-not-allowed opacity-50' : '',
           'p-3 bg-blue-500 text-white rounded-lg w-auto hover:bg-blue-600 font-bold'
         ]"
       >

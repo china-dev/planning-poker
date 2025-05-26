@@ -5,19 +5,24 @@ import cors from 'cors';
 import { setupRooms } from './rooms';
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173', 
+    origin: process.env.FRONTEND_URL, 
     methods: ['GET', 'POST']
   }
 });
 
 setupRooms(io);
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 httpServer.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
+  console.log(`Backend running on port ${PORT}`);
 });

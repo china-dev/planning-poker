@@ -70,9 +70,10 @@ export function useConnection() {
     roomName: string,
     roomId: string,
     userId: string,
+    tabId: string,
     callback?: (response: CallbackResponse) => void
   ) {
-    socket.emit('createRoom', { userName, roomName, roomId, userId }, callback);
+    socket.emit('createRoom', { userName, roomName, roomId, userId, tabId  }, callback);
   }
 
   function joinedPlayer(
@@ -80,9 +81,11 @@ export function useConnection() {
     roomId: string,
     userId: string,
     isSpectator: boolean,
+    isAdmin: boolean,
+    tabId: string,
     callback?: (response: CallbackResponse) => void
   ) {
-    socket.emit('joinedPlayer', { userName, roomId, userId, isSpectator }, callback);
+    socket.emit('joinedPlayer', { userName, roomId, userId, isSpectator, isAdmin,tabId }, callback);
   }
 
   function votePlayer(vote: number, callback?: (response: CallbackDefault) => void) {
@@ -127,6 +130,10 @@ export function useConnection() {
     socket.on('onVotesReset', callback);
   }
 
+  function onMultipleTabs(callback: (data: CallbackDefault) => void) {
+    socket.on('onMultipleTabs', callback);
+  }
+
   /** ---------------------- Remove Listeners ---------------------- */
 
   function removeListeners() {
@@ -136,6 +143,7 @@ export function useConnection() {
     socket.off('onVoteRevealed');
     socket.off('onVotesReset');
     socket.off('connect_error');
+    socket.off('onMultipleTabs');
   }
 
   return {
@@ -158,6 +166,7 @@ export function useConnection() {
     onPlayerVoted,
     onVoteRevealed,
     onVotesReset,
+    onMultipleTabs,
 
     /** Remove Listeners */
     removeListeners

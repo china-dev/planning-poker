@@ -19,11 +19,11 @@
 
 <template>
   <main class="flex flex-col justify-between h-full">
-    <div class="fixed top-40">
+    <!-- <div class="fixed top-40">
       <pre>
         {{ userStore }}
       </pre>
-    </div>
+    </div> -->
     <ListPlayers />
     <HeaderRoom />
     <TableVotes />

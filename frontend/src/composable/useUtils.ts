@@ -38,12 +38,7 @@ export function useUtils() {
     });
   }
 
-  function handleGetPlayers(): void {
-
-    console.log('RoomId da store', userStore.roomId);
-    console.log('RoomID da session', sessionStorage.getItem('planningPokerSession'));
-    
-    
+  function handleGetPlayers(): void {    
     getPlayers((response) => {
       if (response.success) {
         players.value = Object.values(response.players);

@@ -1,0 +1,12 @@
+.modalAlert {
+  background-color: #dde7f1;
+  max-width: 460px;
+  width: 100%;
+  height: 350px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}

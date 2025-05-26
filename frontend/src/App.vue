@@ -4,25 +4,40 @@
   import AlertMessages from './components/common/AlertMessages.vue';
   import FooterBar from './components/common/FooterBar.vue';
   import { useSession } from './composable/useSession.ts';
-  import { useFormHome } from './composable/UseFormHome.ts';
+  import ModalAlert from './components/common/ModalAlert.vue';
+  import { useUserStore } from './store/user.ts';
 
-  const { loadSession, hasSession } = useSession();
-  const { handleJoinRoom } = useFormHome();
+  const { loadSession, hasSession, startListeningOnMultipleTabs } = useSession();
+ 
+  const userStore = useUserStore();
 
   const { createServer, disconnectServer} = useConnection();
 
   onMounted(() => {
+    startListeningOnMultipleTabs();
     createServer();
     if (hasSession()) {
-      
       const session = loadSession();
-      if (session?.roomId.length && session.userId.length && session.userName) {
-        handleJoinRoom(
-          session.userName,
-          session.roomId,
-          session.isSpectator as boolean,
-          session.isAdmin as boolean
-        );
+
+      if (
+          session.userId?.length &&
+          session.userName &&
+          session.roomName &&
+          session.roomId
+        ) {
+
+            const title = `Ops!!! 🤭`;
+            const text = `${session.userName} parece que você já participa da sala ${session.roomName} \n\n` +
+              `Deseja continuar de onde parou?` ;
+            const type = 'reconnectSession';
+
+            const data = {
+              text,
+              title,
+              type
+            }
+
+            userStore.setAlert(data);
       }
     }
   });
@@ -37,6 +52,7 @@
   <div class="wrapContentPage bg-blue-50">
     <router-view />
     <AlertMessages />
+    <ModalAlert v-if="userStore.modalActive" />
     <FooterBar />
   </div>
 </template>

@@ -12,7 +12,7 @@ export function useFormHome() {
   const userStore = useUserStore();
   const router = useRouter();
   const { createRoom, joinedPlayer } = useConnection();
-  const { session, saveSession } = useSession();
+  const { session, saveSession, tabId } = useSession();
   const userId = session.value?.userId || '';
 
   function validade(userName: string, roomId: string): ResponseForm {
@@ -31,20 +31,20 @@ export function useFormHome() {
     const roomId = roomIdRaw.trim();
     const result = validade(userName, roomId);
 
-    console.log(isAdmin);
-    
-
     if (result.error) {
       userStore.setMessage({ text: result.message, success: false });
       return;
     }
 
-    joinedPlayer(userName, roomId, userId, isSpectator, (response) => {
+
+    joinedPlayer(userName, roomId, userId, isSpectator, isAdmin, tabId, (response) => {
       if (response.success) {
+        
         const roomName = response.room.roomName;
         
         saveSession({ userName, roomId, roomName, isSpectator, isAdmin });
         userStore.setUser(userName, roomName, roomId, isAdmin, isSpectator, userId);
+        userStore.removeAlert();
         router.push(`/room/${roomId}`);
       } else {
         userStore.setMessage({ text: response.message, success: false });
@@ -62,9 +62,9 @@ export function useFormHome() {
       return;
     }
 
-    createRoom(userName, nameRoomRaw, roomId, userId, (response) => {
+    createRoom(userName, nameRoomRaw, roomId, userId, tabId,  (response) => {
       if (response.success) {
-        saveSession({ userName, roomId, isSpectator: false, isAdmin: true });
+        saveSession({ userName, roomId, roomName: nameRoomRaw, isSpectator: false, isAdmin: true });
         userStore.setUser(userName, nameRoomRaw, roomId, true, false, userId);
         router.push(`/room/${roomId}`);
       } else {

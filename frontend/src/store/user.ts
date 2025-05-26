@@ -8,6 +8,12 @@ type AlertMessage = {
   id?: number;
 };
 
+type ModalAlerts = {
+  title: string;
+  text: string;
+  type: string;
+};
+
 type ResultVotes = {
   votes: {vote: number, qtd: number}[],
   totalVotes: number,
@@ -37,6 +43,8 @@ export const useUserStore = defineStore('user', {
     resultVotes: {} as ResultVotes,
     currentVote: 0,
     alerts: [] as AlertMessage[],
+    modalActive: false,
+    modal: {} as ModalAlerts,
     players: [] as Player[]
 	}),
 	actions: {
@@ -80,6 +88,18 @@ export const useUserStore = defineStore('user', {
         text: data.text,
         success: data.success
       });
+    },
+    setAlert(data: ModalAlerts)  {
+      this.modalActive = true;
+      this.modal.title = data.title;
+      this.modal.text = data.text;
+      this.modal.type = data.type;
+    },
+    removeAlert() {
+      this.modalActive = false;
+      this.modal.title = '';
+      this.modal.text = '';
+      this.modal.type = '';
     },
     removeMessage(id: number) {
       this.alerts = this.alerts.filter((msg) => msg.id !== id);

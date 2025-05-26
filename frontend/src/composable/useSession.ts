@@ -1,5 +1,8 @@
-import { useUserStore } from '../store/user.ts';
 import { ref } from 'vue';
+import { useUserStore } from '../store/user.ts';
+import { useConnection } from './useConnection.ts';
+import { useRouter } from 'vue-router';
+import router from '../router/index.ts';
 
 type SessionData = {
   userId: string;
@@ -11,10 +14,10 @@ type SessionData = {
 };
 
 const SESSION_KEY = 'planningPokerSession';
+const TAB_KEY     = 'planningPokerTabId';
 
-const session = ref<SessionData | null>(null);
+const session = ref<SessionData|null>(null);
 
-// Função interna para gerar uma nova sessão
 function createNewSession(): SessionData {
   return {
     userId: crypto.randomUUID(),
@@ -22,76 +25,95 @@ function createNewSession(): SessionData {
     roomId: '',
     roomName: '',
     isSpectator: false,
-    isAdmin: false
+    isAdmin: false,
   };
 }
 
-// Carrega sessão existente ou cria uma nova
-function initSession(): void {
-  const raw = sessionStorage.getItem(SESSION_KEY);
-
-  if (raw) {
-    try {
-      session.value = JSON.parse(raw);
-    } catch {
-      sessionStorage.removeItem(SESSION_KEY);
-      session.value = createNewSession();
-      persistSession();
-    }
-  } else {
-    session.value = createNewSession();
-    persistSession();
-  }
+function initSession() {
+  const raw = localStorage.getItem(SESSION_KEY);
+  session.value = raw ? JSON.parse(raw) : createNewSession();
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session.value));
 }
 
-function persistSession() {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session.value));
+function getOrCreateTabId(): string {
+  let id = sessionStorage.getItem(TAB_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    sessionStorage.setItem(TAB_KEY, id);
+  }
+  return id;
 }
 
 initSession();
 
 export function useSession() {
   const userStore = useUserStore();
+  const router = useRouter();
+  const { onMultipleTabs } = useConnection();
+  const tabId = getOrCreateTabId();
 
   function saveSession(data: Partial<Omit<SessionData, 'userId'>>) {
     if (!session.value) return;
-    session.value = {
-      ...session.value,
-      ...data
-    };
-    persistSession();
+    session.value = { ...session.value, ...data };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session.value));
   }
 
-  function loadSession(): SessionData {
-    if (!session.value) {
-      session.value = createNewSession();
-      persistSession();
-    }
-    userStore.setUser(
-      session.value.userName,
-      session.value.roomName,
-      session.value.roomId,
-      session.value.isAdmin,
-      session.value.isSpectator,
-      session.value.userId
-    );
-    return session.value;
-  }
+function loadSession() {
+  if (!session.value) initSession();
 
-  function clearSession(): void {
+  const s = session.value!;
+
+  userStore.setUser(
+    s.userName,
+    s.roomName,
+    s.roomId,
+    s.isAdmin,
+    s.isSpectator,
+    s.userId
+  );
+
+  return { ...s, tabId };
+}
+
+  function clearSession() {
     session.value = null;
-    sessionStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(TAB_KEY);
   }
 
-  function hasSession(): boolean {
+  function hasSession() {
     return !!session.value;
+  }
+
+  function startListeningOnMultipleTabs() {
+    onMultipleTabs((data) => {
+      console.log('multitabs');
+      
+      // alert(data.message);
+      
+      const title = `Ops!!! 🤭🙅‍♂️`;
+            const text = `Você abriu a aplicação em outra aba. Não é possivél dar 2 votos` ;
+            const type = 'multipleSessions';
+
+            const message = {
+              text,
+              title,
+              type
+            }
+
+            userStore.setAlert(message);
+
+      router.push('/');
+    });
   }
 
   return {
     session,
+    tabId,
     saveSession,
     loadSession,
     clearSession,
-    hasSession
+    hasSession,
+    startListeningOnMultipleTabs,
   };
 }

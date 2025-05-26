@@ -38,7 +38,7 @@ export function useFormHome() {
 
 
     joinedPlayer(userName, roomId, userId, isSpectator, isAdmin, tabId, (response) => {
-      if (response.success) {
+      if (response.success && response.room) {
         
         const roomName = response.room.roomName;
         

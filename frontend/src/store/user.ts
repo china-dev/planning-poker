@@ -1,12 +1,15 @@
 import { defineStore } from 'pinia';
+import type { Player } from '../types/player';
 import ResultVotes from '../components/room/ResultVotes.vue';
 
 
 type AlertMessage = {
   text: string;
   success: boolean;
-  id?: number;
+  id: number;
 };
+
+type AlertData = { text: string; success: boolean };
 
 type ModalAlerts = {
   title: string;
@@ -20,12 +23,6 @@ type ResultVotes = {
   average: number
 }
 
-type Player = {
-  userId: string;
-  userName: string;
-  vote: number | null;
-  isSpectator: boolean;
-};
 
 
 let alertCounter = 0;
@@ -82,7 +79,7 @@ export const useUserStore = defineStore('user', {
       this.resultVotes = { votes: [], totalVotes: 0, average: 0 };
       this.currentVote = 0;
     },
-    setMessage(data: AlertMessage) {
+    setMessage(data: AlertData) {
       this.alerts.push({
         id: alertCounter++,
         text: data.text,

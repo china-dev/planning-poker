@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-import type { ClientToServerEvents, ServerToClientEvents } from '@/types/socketTypes';
+import type { ClientToServerEvents, ServerToClientEvents } from '../types/socketTypes.ts';
 
 const URL = 'http://localhost:3001';
 

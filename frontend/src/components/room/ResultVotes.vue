@@ -3,24 +3,24 @@
   import AvarageVote from './AvarageVote.vue';
   import { useVotes } from "../../composable/useVotes.ts";
   
-  const { dataResultList } = useVotes();
+  const { voteResults } = useVotes();
 
 </script>
 <template>
   <div class="wrapperCards">
     <div class="flex justify-center items-center h-40">
       <Card
-        v-for="item in dataResultList.votes"
+        v-for="item in voteResults.votes"
         :key="item.vote"
         :value="item.vote"
-        :totalVotes="dataResultList.totalVotes"
+        :totalVotes="voteResults.totalVotes"
         :qtdVotes="item.qtd"
         class="cardResult"
       />
 
       <AvarageVote
-        v-if="dataResultList.votes.length"
-        :avarage="dataResultList.avarage"
+        v-if="voteResults.votes.length"
+        :avarage="voteResults.average"
       />
 
     </div>

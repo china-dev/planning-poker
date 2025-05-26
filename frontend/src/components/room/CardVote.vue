@@ -2,16 +2,11 @@
   import { defineProps } from 'vue'
   import { useUserStore } from '../../store/user.ts'
   import { useVotes } from '../../composable/useVotes.ts'
+  import type { Player } from '../../types/player';
+
 
   const userStore = useUserStore();
-  const { handleVote, getSuitForPlayer } = useVotes()
-
-  type Player = {
-    userName: string;
-    isAdmin: boolean;
-    isSpectator?: boolean;
-    vote?: number;
-  }
+  const { handleVote, getSuitForPlayer } = useVotes();
 
   const { value, totalVotes, qtdVotes } = defineProps<{
     value: number | Player;

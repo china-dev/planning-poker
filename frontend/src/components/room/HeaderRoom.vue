@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, onBeforeUnmount } from 'vue';
+  import { onMounted } from 'vue';
   import { useUserStore } from '../../store/user.ts';
   import { useUtils } from '../../composable/useUtils.ts';
   import { useVotes } from '../../composable/useVotes.ts';

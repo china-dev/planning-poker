@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-  import { ref, type Ref } from 'vue';
   import { useUserStore } from "../../store/user.ts";
   import { useFormHome } from '../../composable/UseFormHome.ts';
   import { useSession } from '../../composable/useSession.ts';

@@ -26,7 +26,7 @@ export function useUtils() {
 
   function startListeningPlayerJoin(): void {
     onJoinedPlayer((response) => {
-      if (response.success) {
+      if (response.success && response.players) {
         players.value = Object.values(response.players);
         userStore.setMessage({
           text: response.message,
@@ -40,7 +40,7 @@ export function useUtils() {
 
   function handleGetPlayers(): void {    
     getPlayers((response) => {
-      if (response.success) {
+      if (response.success && response.players) {
         players.value = Object.values(response.players);
       } else {
         console.error('❌ Erro ao obter jogadores:', response.message);

@@ -1,15 +1,9 @@
 import { computed, reactive, ref } from 'vue';
 import { useUserStore } from '../store/user';
 import { useConnection } from './useConnection';
+import type { Player, Players } from '../types/player';
 
 /** ------------------------- Tipagem ------------------------- */
-type Player = {
-  userId: string;
-  userName: string;
-  isAdmin: boolean;
-  isSpectator?: boolean;
-  vote?: number;
-};
 
 type ResultVotes = {
   votes: { vote: number; qtd: number }[];
@@ -57,13 +51,24 @@ export function useVotes() {
   /** --------------------- Players --------------------- */
   function handlePlayers(): void {
     getPlayers((response) => {
-      if (response.success) {
-        userStore.setPlayers(response.players);
+      if (response.success && response.players) {
+        userStore.setPlayers(toArray(response.players));
       } else {
         console.error('❌ Erro ao buscar players:', response.message);
       }
     });
   }
+
+  function toArray(raw: Players): Player[] {
+    return Object.values(raw).map(p => ({
+      userId:    p.userId,
+      userName:  p.userName,
+      isAdmin:   p.isAdmin,
+      isSpectator: !!p.isSpectator,
+      vote:      typeof p.vote === 'number' ? p.vote : null,
+    }));
+  }
+
 
   /** --------------------- Listeners Voto --------------------- */
   function listenVotes(): void {
@@ -87,11 +92,11 @@ export function useVotes() {
   /** --------------------- Listeners Reset --------------------- */
   function listenReset(): void {
     onVotesReset((response) => {
-      console.log(response);
-      
-      userStore.setPlayers(response.players);
-      userStore.setVoteRevealed(false);
-      resetResults();
+      if (response.success && response.players) {
+        userStore.setPlayers(toArray(response.players))
+        userStore.setVoteRevealed(false);
+        resetResults();
+      }
     });
   }
 
@@ -162,8 +167,8 @@ export function useVotes() {
   /** --------------------- Restart --------------------- */
   function handleRestartVote() {
     restartVote((response) => {
-      if (response.success) {
-        userStore.setPlayers(response.players);
+      if (response.success && response.players) {
+        userStore.setPlayers(toArray(response.players))
         userStore.setVoteRevealed(false);
         resetResults();
       } else {

@@ -3,13 +3,13 @@
   import { useVotes } from "../../composable/useVotes.ts";
   import ResultVotes from './ResultVotes.vue';
   
-  const { dataVoteRevelead } = useVotes();
+  const { voteRevealedState } = useVotes();
 
 </script>
 <template>
   <section>    
     <transition name="fade" mode="out-in">
-      <ResultVotes v-if="dataVoteRevelead" />
+      <ResultVotes v-if="voteRevealedState" />
       <TrailCards v-else />
     </transition>
   </section>

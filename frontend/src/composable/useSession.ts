@@ -2,7 +2,6 @@ import { ref } from 'vue';
 import { useUserStore } from '../store/user.ts';
 import { useConnection } from './useConnection.ts';
 import { useRouter } from 'vue-router';
-import router from '../router/index.ts';
 
 type SessionData = {
   userId: string;
@@ -86,11 +85,7 @@ function loadSession() {
   }
 
   function startListeningOnMultipleTabs() {
-    onMultipleTabs((data) => {
-      console.log('multitabs');
-      
-      // alert(data.message);
-      
+    onMultipleTabs((_data) => {
       const title = `Ops!!! 🤭🙅‍♂️`;
             const text = `Você abriu a aplicação em outra aba. Não é possivél dar 2 votos` ;
             const type = 'multipleSessions';

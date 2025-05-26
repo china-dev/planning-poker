@@ -10,7 +10,6 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.41.1",
     "pinia": "^3.0.2",
     "socket.io-client": "^4.8.1",
     "vue": "^3.5.13",
@@ -28,5 +27,8 @@
     "typescript": "~5.7.2",
     "vite": "^6.3.1",
     "vue-tsc": "^2.2.8"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.41.1"
   }
 }

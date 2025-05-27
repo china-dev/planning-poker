@@ -252,6 +252,7 @@ export function setupRooms(io: Server) {
           delete room.players[userId];
           socket.leave(roomId);
 
+          console.log('cheguei aqui');
           io.to(roomId).emit("playerLeft", {
             success: true,
             message: getRandomAlertMessage("onDisconnect", player.userName)

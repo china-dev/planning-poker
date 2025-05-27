@@ -126,11 +126,11 @@ export function useConnection() {
   }
 
   function onRoomClosed (callback: (data: {success: true; message: string }) => void)  {    
-    socket.on("roomClosed", () => callback);
+    socket.on("roomClosed", callback);
   }
 
   function onPlayerLeft (callback: (data: {success: true; message: string }) => void)  {    
-    socket.on("playerLeft", () => callback);
+    socket.on("playerLeft", callback);
   }
 
 

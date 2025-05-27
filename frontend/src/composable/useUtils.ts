@@ -4,7 +4,7 @@ import { useUserStore } from '../store/user.ts';
 
 export function useUtils() {
   const userStore = useUserStore();
-  const { onJoinedPlayer, getPlayers, onPlayerDisconnect } = useConnection();
+  const { onJoinedPlayer, getPlayers, onPlayerDisconnect, onPlayerLeft } = useConnection();
 
   const players = ref<any[]>([]);
 
@@ -51,6 +51,7 @@ export function useUtils() {
   }
 
   function startListeningPlayerDisconnect(): void {
+    
     onPlayerDisconnect((response) => {
       if (response.success) {
         handleGetPlayers();
@@ -63,6 +64,25 @@ export function useUtils() {
       }
     });
   }
+  
+  function startListeningPlayerLeft(): void {
+    console.log('to ouvindo');
+    onPlayerLeft((response) => {
+      console.log('ouvi', response);
+      if (response.success) {
+        handleGetPlayers();
+        userStore.setMessage({
+          text: response.message,
+          success: true
+        });
+      } else {
+        console.error('❌ Erro ao processar saída:', response.message);
+      }
+    });
+  }
+
+
+  
 
   function getRoleEmoji(player: any): string {
     if (player.isAdmin) return '👑';
@@ -76,6 +96,7 @@ export function useUtils() {
     getRoleEmoji,
     handleGetPlayers,
     startListeningPlayerJoin,
-    startListeningPlayerDisconnect
+    startListeningPlayerDisconnect,
+    startListeningPlayerLeft
   };
 }

@@ -7,13 +7,15 @@
     players,
     getRoleEmoji,
     handleGetPlayers,
-    startListeningPlayerDisconnect
+    startListeningPlayerDisconnect,
+    startListeningPlayerLeft
   } = useUtils();
 
   onMounted(() => {
     handleGetPlayers();
     startListeningPlayerJoin();
     startListeningPlayerDisconnect();
+    startListeningPlayerLeft();
   });
 
 </script>

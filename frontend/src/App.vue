@@ -7,7 +7,7 @@
   import ModalAlert from './components/common/ModalAlert.vue';
   import { useUserStore } from './store/user.ts';
 
-  const { startListeningOnMultipleTabs } = useSession();
+  const { startListeningOnMultipleTabs, startOncloseRoom } = useSession();
  
   const userStore = useUserStore();
 
@@ -16,6 +16,7 @@
   onMounted(() => {
     startListeningOnMultipleTabs();
     createServer();
+    startOncloseRoom();
   });
 
   onBeforeUnmount(() => {

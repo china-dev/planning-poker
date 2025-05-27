@@ -50,7 +50,13 @@ initSession();
 export function useSession() {
   const userStore = useUserStore();
   const router = useRouter();
-  const { onMultipleTabs } = useConnection();
+  const {
+    onMultipleTabs,
+    leaveRoom,
+    disconnectServer,
+    onRoomClosed,
+    createServer
+  } = useConnection();
   const tabId = getOrCreateTabId();
 
   function saveSession(data: Partial<Omit<SessionData, 'userId'>>) {
@@ -74,6 +80,26 @@ export function useSession() {
     );
 
     return { ...s, tabId };
+  }
+
+  function clearAll() {
+    clearSession();
+    localStorage.clear();
+    sessionStorage.clear();
+    userStore.$reset();
+  }
+
+  function logout() {
+    leaveRoom((res) => {
+      if (!res.success) {
+        console.warn(res.message);
+      }
+      disconnectServer();
+      clearAll();
+      createServer();
+      loadSession();
+      router.replace({ name: 'Home' });
+    });
   }
 
   function clearSession() {
@@ -101,6 +127,14 @@ export function useSession() {
       userStore.setAlert(message);
 
       router.push('/');
+    });
+  }
+
+  function startOncloseRoom () {
+    onRoomClosed((data) => {
+      alert(data.message);
+      clearAll();
+      router.replace({ name: 'Home' });
     });
   }
 
@@ -150,6 +184,8 @@ export function useSession() {
     clearSession,
     hasSession,
     startListeningOnMultipleTabs,
-    verifySession
+    verifySession,
+    logout,
+    startOncloseRoom
   };
 }

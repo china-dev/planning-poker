@@ -59,6 +59,11 @@ export interface ClientToServerEvents {
     roomId: string,
     callback: (response: CallbackPlayers) => void
   ) => void;
+
+  leaveRoom: (
+    data: { userId: string; roomId: string },
+    callback: (response: CallbackResponse) => void
+  ) => void;
 }
 
 export interface ServerToClientEvents {
@@ -96,4 +101,16 @@ export interface ServerToClientEvents {
     success: true;
     message: string;
   }) => void;
+
+  roomClosed: (data: {
+    success: true;
+    message: string;
+  }) => void;
+
+  playerLeft: (data: {
+    success: true;
+    message: string;
+  }) => void;
 }
+
+

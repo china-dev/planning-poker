@@ -71,6 +71,14 @@ export function useConnection() {
     socket.emit('joinedPlayer', { userName, roomId, userId, isSpectator, isAdmin,tabId }, callback);
   }
 
+  function leaveRoom(callback: (res: CallbackResponse) => void) {
+    socket.emit(
+      'leaveRoom',
+      { userId: userId.value, roomId: roomId.value },
+      callback
+    );
+  }
+
   function votePlayer(vote: number, callback: (response: CallbackDefault) => void) {
     socket.emit('votePlayer', { roomId: roomId.value, vote, userId: userId.value }, callback);
   }
@@ -117,6 +125,15 @@ export function useConnection() {
     socket.on('onMultipleTabs', callback);
   }
 
+  function onRoomClosed (callback: (data: {success: true; message: string }) => void)  {    
+    socket.on("roomClosed", () => callback);
+  }
+
+  function onPlayerLeft (callback: (data: {success: true; message: string }) => void)  {    
+    socket.on("playerLeft", () => callback);
+  }
+
+
   /** ---------------------- Remove Listeners ---------------------- */
 
   function removeListeners() {
@@ -127,6 +144,8 @@ export function useConnection() {
     socket.off('onVotesReset');
     socket.off('connect_error');
     socket.off('onMultipleTabs');
+    socket.off('roomClosed');
+    socket.off('playerLeft');
   }
 
   return {
@@ -142,6 +161,7 @@ export function useConnection() {
     voteRevealed,
     restartVote,
     getPlayers,
+    leaveRoom,
 
     /** Listeners */
     onJoinedPlayer,
@@ -150,6 +170,8 @@ export function useConnection() {
     onVoteRevealed,
     onVotesReset,
     onMultipleTabs,
+    onRoomClosed,
+    onPlayerLeft,
 
     /** Remove Listeners */
     removeListeners

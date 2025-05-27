@@ -112,7 +112,7 @@ export function setupRooms(io: Server) {
       }
     );
 
-        socket.on(
+    socket.on(
       "votePlayer",
       (
         { roomId, vote, userId }: { roomId: string; vote: number; userId: string },
@@ -213,6 +213,54 @@ export function setupRooms(io: Server) {
         players: room.players,
       });
     });
+
+    socket.on(
+      "leaveRoom",
+      (
+        { userId, roomId }: { userId: string; roomId: string },
+        cb: (res: CallbackResponse) => void
+      ) => {
+        const room = rooms[roomId];
+        if (!room) {
+          return cb({ success: false, message: "Sala não encontrada." });
+        }
+
+        const player = room.players[userId];
+        if (!player) {
+          return cb({ success: false, message: "Você não está na sala." });
+        }
+
+
+        clearDisconnect(userId);
+        userConnectionMap.delete(userId);
+        
+        if (player.isAdmin) {
+          io.to(roomId).emit("roomClosed", {
+            success: true,
+            message: `Sala ${room.roomName} encerrada pelo Admin.`,
+          });
+          
+          delete rooms[roomId];
+
+          const socketsInRoom = io.sockets.adapter.rooms.get(roomId) || new Set();
+          for (const sockId of socketsInRoom) {
+            io.sockets.sockets.get(sockId)?.leave(roomId);
+          }
+          cb({ success: true, message: "Sala encerrada com sucesso.", room: null as any });
+        } else {
+
+          delete room.players[userId];
+          socket.leave(roomId);
+
+          io.to(roomId).emit("playerLeft", {
+            success: true,
+            message: getRandomAlertMessage("onDisconnect", player.userName)
+          });
+          cb({ success: true, message: "Você saiu da sala.", room });
+        }
+      }
+    );
+
 
 
     socket.on("disconnect", () => {

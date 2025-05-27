@@ -14,6 +14,8 @@
   
   onBeforeUnmount(() => {
     removeListeners();
+    console.log('teste');
+    
   });
 </script>
 

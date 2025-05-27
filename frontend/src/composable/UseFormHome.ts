@@ -62,12 +62,7 @@ export function useFormHome() {
       return;
     }
 
-    console.log(userName, nameRoomRaw, roomId, userId, tabId);
-    
-
     createRoom(userName, nameRoomRaw, roomId, userId, tabId,  (response) => {
-      console.log(response);
-      
       if (response.success) {
         saveSession({ userName, roomId, roomName: nameRoomRaw, isSpectator: false, isAdmin: true });
         userStore.setUser(userName, nameRoomRaw, roomId, true, false, userId);

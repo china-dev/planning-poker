@@ -11,9 +11,15 @@ import type {
 
 /** ---------------------- Tipagens ---------------------- */
 
-type CallbackDefault = // não é mais usado em emits
+type CallbackDefault = 
   | { success: true; message: string }
   | { success: false; message: string };
+
+type Themes = {
+  name: string;
+  mostVoted: number;
+  avarage: number;
+};
 
 /** ------------------------------------------------------- */
 
@@ -95,6 +101,17 @@ export function useConnection() {
     socket.emit('getPlayers', roomId.value, callback);
   }
 
+  function initVotesGeral(
+    themeName: string,
+    callback: (res: CallbackResponse) => void
+  ) {
+    socket.emit(
+      "InitVotes",
+      { roomId: roomId.value, theme: { name: themeName } },
+      callback
+    );
+  }
+
   /** ---------------------- Listeners ---------------------- */
 
   function onJoinedPlayer(callback: (data: CallbackPlayers) => void) {
@@ -133,6 +150,10 @@ export function useConnection() {
     socket.on("playerLeft", callback);
   }
 
+  function onInitVotes(callback: (data: { success: true; themes: Themes[]; message: string }) => void) {
+    socket.on("onInitVotes", callback);
+  }
+
 
   /** ---------------------- Remove Listeners ---------------------- */
 
@@ -146,6 +167,7 @@ export function useConnection() {
     socket.off('onMultipleTabs');
     socket.off('roomClosed');
     socket.off('playerLeft');
+    socket.off('onInitVotes');
   }
 
   return {
@@ -162,6 +184,7 @@ export function useConnection() {
     restartVote,
     getPlayers,
     leaveRoom,
+    initVotesGeral,
 
     /** Listeners */
     onJoinedPlayer,
@@ -172,6 +195,7 @@ export function useConnection() {
     onMultipleTabs,
     onRoomClosed,
     onPlayerLeft,
+    onInitVotes,
 
     /** Remove Listeners */
     removeListeners

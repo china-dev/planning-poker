@@ -66,9 +66,7 @@ export function useUtils() {
   }
   
   function startListeningPlayerLeft(): void {
-    console.log('to ouvindo');
     onPlayerLeft((response) => {
-      console.log('ouvi', response);
       if (response.success) {
         handleGetPlayers();
         userStore.setMessage({

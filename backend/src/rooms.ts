@@ -10,8 +10,22 @@ type Player = {
   isSpectator?: boolean;
   vote?: number;
 };
+
+type Themes = {
+  name: string;
+  mostVoted: number;
+  average: number;
+};
+
 type Players = Record<string, Player>;
-type Room = { roomName: string; players: Players; voteReveal?: boolean };
+
+type Room = { 
+  roomName: string; 
+  players: Players; 
+  voteReveal?: boolean;
+  initVotes?: boolean;
+  themes: Themes[];
+};
 
 type CallbackResponse =
   | { success: true; message: string; room: Room }
@@ -65,6 +79,7 @@ export function setupRooms(io: Server) {
             [userId]: { userId, userName, isAdmin: true }
           },
           voteReveal: false,
+          themes: []
         };
 
         userConnectionMap.set(userId, { socketId: socket.id, tabId });
@@ -200,6 +215,7 @@ export function setupRooms(io: Server) {
       });
 
       room.voteReveal = false;
+      room.initVotes = false;
 
       io.to(roomId).emit("onVotesReset", {
         success: true,
@@ -213,6 +229,37 @@ export function setupRooms(io: Server) {
         players: room.players,
       });
     });
+
+    socket.on(
+      "InitVotes",
+      (
+        { roomId, theme }: { roomId: string; theme: { name: string } },
+        callback: (response: CallbackResponse) => void
+      ) => {
+        const room = rooms[roomId];
+        if (!room) {
+          return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+        }
+
+        room.themes.push({
+          name: theme.name,
+          mostVoted: 0,
+          average: 0
+        });
+
+        io.to(roomId).emit("onInitVotes", {
+          success: true,
+          themes: room.themes,
+          message: "Tema da sala atualizado."
+        });
+
+        callback({
+          success: true,
+          message: "Tema Definido.",
+          room
+        });
+      }
+    );
 
     socket.on(
       "leaveRoom",

@@ -64,6 +64,11 @@ export interface ClientToServerEvents {
     data: { userId: string; roomId: string },
     callback: (response: CallbackResponse) => void
   ) => void;
+
+  InitVotes: (
+    data: { roomId: string, theme: { name: string }},
+    callback: (response: CallbackResponse) => void
+  ) => void;
 }
 
 export interface ServerToClientEvents {
@@ -110,6 +115,12 @@ export interface ServerToClientEvents {
   playerLeft: (data: {
     success: true;
     message: string;
+  }) => void;
+
+  onInitVotes: (data: {
+    success: true;
+    message: string;
+    themes: []
   }) => void;
 }
 

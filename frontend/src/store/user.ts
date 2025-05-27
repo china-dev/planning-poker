@@ -45,7 +45,6 @@ export const useUserStore = defineStore('user', {
     voteRevealed: false,
     mostVoted: 0,
     initVotes: false,
-    // Inicia com o que estiver no localStorage
     themes: JSON.parse(localStorage.getItem(THEMES_STORAGE_KEY) || '[]') as Themes[],
     resultVotes: {} as ResultVotes,
     currentVote: 0,

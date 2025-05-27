@@ -14,7 +14,7 @@ function handleUserMode(mode:boolean, admin: boolean) {
 </script>
 
 <template>
-  <main class="flex flex-col items-center justify-center p-4 h-full">
+  <main class="flex flex-col items-center justify-center p-4 mainHome">
     <div class="flex flex-col items-center justify-center h-full space-y-10">
       <h1 class="text-3xl font-bold">♣️Planning Poker♦️</h1>
   

@@ -117,7 +117,7 @@ h1, h2, h3 {
 
 .wrapContentPage {
   min-height: 100vh;
-  
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -127,4 +127,7 @@ h1, h2, h3 {
 }
 .navRoom {
   min-height: 104px;
+}
+.mainHome {
+  height: calc(100vh - 64px - 3rem);
 }

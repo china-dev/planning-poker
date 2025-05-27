@@ -63,6 +63,9 @@ export const useUserStore = defineStore('user', {
     setSocketId (socketId: string | null | undefined) {
       this.socketId = socketId;
     },
+    setRoomId (roomId: string) {
+      this.roomId = roomId;
+    },
     setVote(vote: number) {
       this.currentVote = vote;
     },

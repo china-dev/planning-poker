@@ -17,7 +17,11 @@ export function useUtils() {
 
     navigator.clipboard.writeText(message)
       .then(() => {
-        alert('✅ Convite copiado! Compartilhe com seus colegas.');
+        alert('');
+          userStore.setMessage({
+            text: '✅ Convite copiado! Compartilhe com seus colegas.',
+            success: true
+        });
       })
       .catch((err) => {
         console.error('❌ Erro ao copiar convite:', err);

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
+  import { onMounted  } from 'vue';
   import { useUserStore } from '../../store/user.ts';
   import { useUtils } from '../../composable/useUtils.ts';
   import { useVotes } from '../../composable/useVotes.ts';
 
-  const {userName, nameRoom, isAdmin, roomId } = useUserStore();
+  const userStore = useUserStore();
   const { invitePlayers } = useUtils();
-
+  
   const {
     handlePlayers,
     playersWithVotes,
@@ -17,7 +17,7 @@
     listenReset,
     voteRevealedState
   } = useVotes();
-
+  
   onMounted(() => {
     handlePlayers();
     listenVotes();
@@ -28,10 +28,10 @@
 
 <template>
   <nav class="p-7 flex justify-between navRoom bg-gray-800 text-white shadow-lg">
-    <h1 class="text-3xl font-bold">♣️{{ nameRoom }}♦️</h1>
+    <h1 class="text-3xl font-bold">♣️{{ userStore.nameRoom }}♦️</h1>
     <div class="flex justify-center items-center">
       <button
-        v-if="isAdmin"
+        v-if="userStore.isAdmin"
         :disabled="!playersWithVotes.length"
         @click="playersWithVotes.length ? handleRevealVotes() : null"
         :class="[
@@ -42,7 +42,7 @@
         Revelar Cartas
       </button>
       <button
-        v-if="isAdmin"
+        v-if="userStore.isAdmin"
         :disabled="!voteRevealedState"
         @click="handleRestartVote"
         :class="[
@@ -55,11 +55,11 @@
     </div>
     <div class="flex items-center">
       <p class="text-2xl font-bold mr-10">
-        {{ userName }}
+        {{ userStore.userName }}
       </p>
       <button
-        @click="invitePlayers(userName, nameRoom, roomId)"
-        v-if="isAdmin" 
+        @click="invitePlayers(userStore.userName, userStore.nameRoom, userStore.roomId)"
+        v-if="userStore.roomId" 
         class="
           p-3
           rounded-full

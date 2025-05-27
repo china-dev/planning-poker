@@ -114,7 +114,7 @@ export function useVotes() {
 
   /** --------------------- Computed --------------------- */
   const playersWithVotes = computed<Player[]>(()=>{
-    return Object.values(userStore.players).filter((player) => player.vote !== undefined);
+    return Object.values(userStore.players).filter((player) => player.vote !== null);
   });
 
   const voteRevealedState = computed(() => userStore.voteRevealed);

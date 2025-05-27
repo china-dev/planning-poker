@@ -10,8 +10,7 @@
 
   const userStore = useUserStore();
   const { removeListeners } = useConnection();
-
-
+  
   onBeforeUnmount(() => {
     removeListeners();
   });

@@ -57,22 +57,22 @@ export function useSession() {
     localStorage.setItem(SESSION_KEY, JSON.stringify(session.value));
   }
 
-function loadSession() {
-  if (!session.value) initSession();
+  function loadSession() {
+    if (!session.value) initSession();
 
-  const s = session.value!;
+    const s = session.value!;
 
-  userStore.setUser(
-    s.userName,
-    s.roomName,
-    s.roomId,
-    s.isAdmin,
-    s.isSpectator,
-    s.userId
-  );
+    userStore.setUser(
+      s.userName,
+      s.roomName,
+      s.roomId,
+      s.isAdmin,
+      s.isSpectator,
+      s.userId
+    );
 
-  return { ...s, tabId };
-}
+    return { ...s, tabId };
+  }
 
   function clearSession() {
     session.value = null;
@@ -87,19 +87,57 @@ function loadSession() {
   function startListeningOnMultipleTabs() {
     onMultipleTabs((_data) => {
       const title = `Ops!!! 🤭🙅‍♂️`;
-            const text = `Você abriu a aplicação em outra aba. Não é possivél dar 2 votos` ;
-            const type = 'multipleSessions';
+      const text = `Você abriu a aplicação em outra aba. Não é possivél dar 2 votos` ;
+      const type = 'multipleSessions';
 
-            const message = {
+      const message = {
+        text,
+        title,
+        type
+      }
+
+      userStore.setAlert(message);
+
+      router.push('/');
+    });
+  }
+
+  function verifySession () {
+    if (hasSession()) {
+    const session = loadSession();
+
+      if (
+          session.userId?.length &&
+          session.userName &&
+          session.roomName &&
+          session.roomId
+        ) {
+            const title = `Ops!!! 🤭`;
+            const text = `${session.userName} parece que você já participa da sala ${session.roomName} \n\n` +
+              `Deseja continuar de onde parou?` ;
+            const type = 'reconnectSession';
+
+            const data = {
               text,
               title,
               type
             }
 
-            userStore.setAlert(message);
+            userStore.setAlert(data);
+      } else {
+        const title = `Ops!!! 🫷`;
+        const text = `Realize o login para continuar, utilize o ID da Sala fornecido pelo Admin` ;
+        const type = 'loginHome';
 
-      router.push('/');
-    });
+        const message = {
+          text,
+          title,
+          type
+        }
+
+        userStore.setAlert(message);
+      }
+    }
   }
 
   return {
@@ -110,5 +148,6 @@ function loadSession() {
     clearSession,
     hasSession,
     startListeningOnMultipleTabs,
+    verifySession
   };
 }

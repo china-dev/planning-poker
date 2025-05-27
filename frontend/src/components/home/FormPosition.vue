@@ -6,20 +6,22 @@
   const nameRoom = ref<string>('');
   const roomId = ref<string>('');
   const isSpectator = ref<boolean>(false);
-
+  
   const { isAdmin } = defineProps<{
     isAdmin: boolean
   }>();
-
+  
   const emit = defineEmits<{
     (e: 'selectMode', modeSelected: boolean, isAdmin: boolean): void;
   }>();
-
+  
   const { handleCreateRoom, handleJoinRoom } = useFormHome();
+  
+
 </script>
 
 <template>
-  <form class="flex flex-col space-y-6 my-8" @submit.prevent="">
+  <form class="flex flex-col space-y-6 my-8" @submit.prevent @keydown.enter.prevent>
     <button
       class="top-4 left-4 absolute flex items-center text-blue-500"
       @click="emit('selectMode', false, false)"

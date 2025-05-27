@@ -7,7 +7,7 @@
   import ModalAlert from './components/common/ModalAlert.vue';
   import { useUserStore } from './store/user.ts';
 
-  const { loadSession, hasSession, startListeningOnMultipleTabs } = useSession();
+  const { startListeningOnMultipleTabs } = useSession();
  
   const userStore = useUserStore();
 
@@ -16,30 +16,6 @@
   onMounted(() => {
     startListeningOnMultipleTabs();
     createServer();
-    if (hasSession()) {
-      const session = loadSession();
-
-      if (
-          session.userId?.length &&
-          session.userName &&
-          session.roomName &&
-          session.roomId
-        ) {
-
-            const title = `Ops!!! 🤭`;
-            const text = `${session.userName} parece que você já participa da sala ${session.roomName} \n\n` +
-              `Deseja continuar de onde parou?` ;
-            const type = 'reconnectSession';
-
-            const data = {
-              text,
-              title,
-              type
-            }
-
-            userStore.setAlert(data);
-      }
-    }
   });
 
   onBeforeUnmount(() => {
@@ -50,6 +26,12 @@
 
 <template>
   <div class="wrapContentPage bg-blue-50">
+
+       <div class="fixed top-40">
+      <pre>
+        {{ userStore }}
+      </pre>
+    </div>
     <router-view />
     <AlertMessages />
     <ModalAlert v-if="userStore.modalActive" />

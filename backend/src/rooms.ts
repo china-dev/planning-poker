@@ -50,7 +50,6 @@ export function setupRooms(io: Server) {
         if (rooms[roomId]) {
           return cb({ success: false, message: "Sala já existe." });
         }
-        // Mesma lógica de múltiplas abas:
         const prev = userConnectionMap.get(userId);
         if (prev && prev.tabId !== tabId) {
           io.to(prev.socketId).emit("onMultipleTabs", {
@@ -225,9 +224,23 @@ export function setupRooms(io: Server) {
       }
       const [userId] = entry;
       const timeout = setTimeout(() => {
-        // remove jogador da sala...
+        
         userConnectionMap.delete(userId);
         disconnectTimeouts.delete(userId);
+        Object.entries(rooms).forEach(([roomId, room]) => {
+          const player = room.players[userId];
+          if (player) {
+            const { userName } = player;
+            delete room.players[userId];
+
+            // emite para todos na sala que o player desconectou
+            io.to(roomId).emit("playerDisconnected", {
+              userId,
+              success: true,
+              message: getRandomAlertMessage("onDisconnect", userName),
+            });
+          }
+        });
       }, 7000);
       disconnectTimeouts.set(userId, timeout);
       console.log(`⚠️ ${socket.id} aguardando reconexão de ${userId}`);

@@ -10,6 +10,7 @@ type SessionData = {
   roomName: string;
   isSpectator: boolean;
   isAdmin: boolean;
+  themes: []
 };
 
 const SESSION_KEY = 'planningPokerSession';
@@ -25,6 +26,7 @@ function createNewSession(): SessionData {
     roomName: '',
     isSpectator: false,
     isAdmin: false,
+    themes: []
   };
 }
 

@@ -4,6 +4,7 @@
   import { useSession } from '../../composable/useSession.ts';
   import FormPosition from "../home/FormPosition.vue";
   import router from "../../router/index.ts";
+  import FormThemeVotes from "../room/FormThemeVotes.vue";
   
   const { modal, removeAlert } = useUserStore();
   const { handleJoinRoom } = useFormHome();
@@ -53,6 +54,11 @@
           Login 🔙
         </button>
       </template>
+
+      <template v-if="modal.type === 'initVotes'">
+        <FormThemeVotes />
+      </template>
+
 
       <FormPosition
         v-if="modal.type === 'login'"

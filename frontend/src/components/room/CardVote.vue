@@ -47,7 +47,7 @@
           'justify-center',
           'mx-2',
         ]"
-        @click="!isPlayer(value) && handleVote(value)"
+        @click="userStore.initVotes ? !isPlayer(value) && handleVote(value) : null"
       > 
         <!-- Frente: Naipe ou valor de voto -->
         <div

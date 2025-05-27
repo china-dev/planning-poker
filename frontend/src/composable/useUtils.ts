@@ -16,7 +16,6 @@ export function useUtils() {
 
     navigator.clipboard.writeText(message)
       .then(() => {
-        alert('');
           userStore.setMessage({
             text: '✅ Convite copiado! Compartilhe com seus colegas.',
             success: true

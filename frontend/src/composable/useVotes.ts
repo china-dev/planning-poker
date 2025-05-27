@@ -9,6 +9,7 @@ type ResultVotes = {
   votes: { vote: number; qtd: number }[];
   totalVotes: number;
   average: number;
+  modeVote: number;
 };
 
 /** ----------------------------------------------------------- */
@@ -34,10 +35,23 @@ export function useVotes() {
   const resultVotes = ref<ResultVotes>({
     votes: [],
     totalVotes: 0,
-    average: 0
+    average: 0,
+    modeVote: 0
   });
 
   /** --------------------- Votação --------------------- */
+  function initVotes (): void {
+     const title = `Lets Start ▶️`;
+      const text = `Configure o tema da votação!` ;
+      const type = 'initVotes';
+
+      const message = {
+        text,
+        title,
+        type
+      }
+    userStore.setAlert(message);
+  }
   function handleVote(userVote: number): void {
     votePlayer(userVote, (response) => {
       if (response.success) {
@@ -119,9 +133,10 @@ export function useVotes() {
 
   const voteRevealedState = computed(() => userStore.voteRevealed);
   const voteResults = computed(() => userStore.resultVotes);
-
+  
   /** --------------------- Resultados --------------------- */
   function countVotes(players: Player[]): void {
+    let modeVote = 0;
     const voteCounter: Record<number, number> = {};
     let total = 0;
     let sum = 0;
@@ -139,11 +154,27 @@ export function useVotes() {
       qtd
     }));
 
+    const average = total > 0 ? sum / total : 0;
+
+    let modeCount = 0;
+    for (const { vote, qtd } of votesArray) {
+      if (qtd > modeCount) {
+        modeCount = qtd;
+        modeVote = vote;
+      }
+    }
+
     resultVotes.value = {
       votes: votesArray,
       totalVotes: total,
-      average: total > 0 ? sum / total : 0
+      average,
+      modeVote
     };
+
+    userStore.updateLastTheme({
+      mostVoted: resultVotes.value.modeVote,
+      avarage:  resultVotes.value.average
+    });
 
     userStore.setResultsVote(resultVotes.value);
   }
@@ -171,6 +202,7 @@ export function useVotes() {
         userStore.setPlayers(toArray(response.players))
         userStore.setVoteRevealed(false);
         resetResults();
+        userStore.setInitVotes(false);
       } else {
         console.error('❌ Erro ao resetar votos:', response.message);
       }
@@ -189,6 +221,7 @@ export function useVotes() {
     handlePlayers,
     handleRevealVotes,
     handleRestartVote,
+    initVotes,
 
     listenVotes,
     listenReveal,

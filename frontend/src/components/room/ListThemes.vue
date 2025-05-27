@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useUserStore } from '../../store/user';
+// import { useUserStore } from '../../store/user';
 import { onBeforeMount } from 'vue';
 import { useVotes } from '../../composable/useVotes';
 
-const userStore = useUserStore();
+// const userStore = useUserStore();
 const { startLinstenerOnInitVotes } = useVotes();
 
 onBeforeMount(() => {

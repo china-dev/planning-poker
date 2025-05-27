@@ -84,15 +84,13 @@ Projeto destinado a equipes que utilizam a metodologia ágil Scrum para estimar 
 2. Envie seu valor de estimativa (sequência de Fibonacci).
 3. Revele as estimativas quando todos estiverem prontos.
 
-```
-
 ---
 
 ## ⚙️ Configuração e Variáveis de Ambiente
 
 Crie um arquivo `.env` na raiz com as seguintes variáveis:
 
-```
+```env
 # Porta do servidor WebSocket backend/.env
 PORT=3001
 FRONTEND_URL=http://localhost:5173

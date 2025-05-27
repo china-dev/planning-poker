@@ -23,7 +23,9 @@ export function useVotes() {
     onPlayerVoted,
     onVoteRevealed,
     onVotesReset,
-    removeListeners
+    removeListeners,
+    onInitVotes,
+    initVotesGeral
   } = useConnection();
 
   const userStore = useUserStore();
@@ -40,6 +42,14 @@ export function useVotes() {
   });
 
   /** --------------------- Votação --------------------- */
+  function startTheme(name: string) {
+    initVotesGeral(name, (res) => {
+      if (!res.success) {
+        userStore.setMessage({ text: res.message, success: false });
+      }
+    });
+  }
+
   function initVotes (): void {
      const title = `Lets Start ▶️`;
       const text = `Configure o tema da votação!` ;
@@ -52,6 +62,7 @@ export function useVotes() {
       }
     userStore.setAlert(message);
   }
+
   function handleVote(userVote: number): void {
     votePlayer(userVote, (response) => {
       if (response.success) {
@@ -95,6 +106,17 @@ export function useVotes() {
     });
   }
 
+  function startLinstenerOnInitVotes () {
+    onInitVotes((data) => {
+      if (data.success) {
+        userStore.setInitVotes(true);
+        data.themes.forEach((t) => {
+          userStore.setThemes(t);
+        });
+      }
+    });
+  }
+
   /** --------------------- Listeners Reveal --------------------- */
   function listenReveal(): void {
     onVoteRevealed((response) => {
@@ -110,6 +132,7 @@ export function useVotes() {
         userStore.setPlayers(toArray(response.players))
         userStore.setVoteRevealed(false);
         resetResults();
+        userStore.setInitVotes(false);
       }
     });
   }
@@ -222,10 +245,12 @@ export function useVotes() {
     handleRevealVotes,
     handleRestartVote,
     initVotes,
+    startTheme,
 
     listenVotes,
     listenReveal,
     listenReset,
+    startLinstenerOnInitVotes,
     removeAllListeners,
 
     playersWithVotes,

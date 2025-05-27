@@ -11,9 +11,8 @@ export function useUtils() {
   function invitePlayers(userName: string, roomName: string, roomId: string): void {
     const message = 
       `${userName} convidou você para participar do Planning Poker: ${roomName}!\n\n` + 
-      `Acesse: https://planingpokerapp.com\n` + 
-      `ID da sala: ${roomId}\n\n` + 
-      `Ou clique no link direto: https://planingpokerapp.com/room/${roomId}`;
+      `Acesse: https://planning-poker-app-dun.vercel.app\n` + 
+      `ID da sala: ${roomId}\n\n`;
 
     navigator.clipboard.writeText(message)
       .then(() => {

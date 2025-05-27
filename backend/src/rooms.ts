@@ -309,8 +309,6 @@ export function setupRooms(io: Server) {
       }
     );
 
-
-
     socket.on("disconnect", () => {
       const entry = Array.from(userConnectionMap.entries())
         .find(([, info]) => info.socketId === socket.id);
@@ -341,5 +339,6 @@ export function setupRooms(io: Server) {
       disconnectTimeouts.set(userId, timeout);
       console.log(`⚠️ ${socket.id} aguardando reconexão de ${userId}`);
     });
+    
   });
 }

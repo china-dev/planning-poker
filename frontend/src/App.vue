@@ -26,12 +26,6 @@
 
 <template>
   <div class="wrapContentPage bg-blue-50">
-
-       <div class="fixed top-40">
-      <pre>
-        {{ userStore }}
-      </pre>
-    </div>
     <router-view />
     <AlertMessages />
     <ModalAlert v-if="userStore.modalActive" />

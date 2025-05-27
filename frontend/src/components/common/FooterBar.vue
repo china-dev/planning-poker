@@ -7,7 +7,7 @@
     <a href="https://github.com/china-dev" class="mx-4" target="_blank">
       <img src="../../assets/github-icon.webp" alt="GitHub" class="w-8">
     </a>
-    <a href="https://github.com/china-dev" target="_blank">
+    <a href="https://www.linkedin.com/in/lucaspaulinodev/" target="_blank">
       <img src="../../assets/linkedin-icon.png" alt="Linkedin" class="w-8">
     </a>
   </footer>

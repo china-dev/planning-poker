@@ -19,6 +19,13 @@
         class="text-2xl font-bold text-center">
         📋 {{ userStore.themes[userStore.themes.length - 1].name }}
       </h2>
+      <h2
+        v-else
+        class="text-2xl font-bold text-center">
+        Aguarde o Admin Iniciar a votação 🫸
+      </h2>
+      
+
     </div>
     <div class="tableVotes">
       <TransitionGroup

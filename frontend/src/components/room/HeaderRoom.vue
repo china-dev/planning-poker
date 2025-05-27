@@ -33,7 +33,7 @@
   <nav class="p-7 flex justify-between navRoom bg-gray-800 text-white shadow-lg">
     <h1 class="text-3xl font-bold">♣️{{ userStore.nameRoom }}♦️</h1>
     <div class="flex items-center">
-      <p class="text-2xl font-bold mr-10">
+      <p class="text-2xl font-bold mr-10 text-nowrap">
         {{ userStore.userName }}
       </p>
       <div class="mr-4">

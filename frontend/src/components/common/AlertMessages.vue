@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, computed } from 'vue';
+import { watch } from 'vue';
 import { useUserStore } from '../../store/user.ts';
 
 const store = useUserStore();

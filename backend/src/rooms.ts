@@ -44,7 +44,7 @@ const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 
 export function setupRooms(io: Server) {
   io.on("connection", (socket: Socket) => {
-    console.log(`🔌 Connected: ${socket.id}`);
+    // console.log(`🔌 Connected: ${socket.id}`);
 
     const clearDisconnect = (userId: string) => {
       const t = disconnectTimeouts.get(userId);
@@ -127,6 +127,25 @@ export function setupRooms(io: Server) {
       }
     );
 
+    socket.on("getPlayers", (roomId: string, callback: (response: CallbackPlayers) => void) => {
+      const room = rooms[roomId];
+      
+      if (!callback || typeof callback !== 'function') {
+        console.warn(`Callback não fornecido para getPlayers na sala ${roomId}`);
+        return;
+      }
+
+      if (!room) {
+        return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
+      }
+
+      callback({
+        success: true,
+        message: "Lista de jogadores.",
+        players: room.players,
+      });
+    });
+
     socket.on(
       "votePlayer",
       (
@@ -149,6 +168,7 @@ export function setupRooms(io: Server) {
         player.vote = vote;
 
         io.to(roomId).emit("playerVoted", {
+          success: true,
           userId,
           userName: player.userName,
           vote,
@@ -162,26 +182,6 @@ export function setupRooms(io: Server) {
         });
       }
     );
-
-    socket.on("getPlayers", (roomId: string, callback: (response: CallbackPlayers) => void) => {
-      const room = rooms[roomId];
-      
-      if (!callback || typeof callback !== 'function') {
-        console.warn(`Callback não fornecido para getPlayers na sala ${roomId}`);
-        return;
-      }
-
-      if (!room) {
-        return callback({ success: false, message: `Sala ${roomId} não encontrada.` });
-      }
-
-      callback({
-        success: true,
-        message: "Lista de jogadores.",
-        players: room.players,
-      });
-    });
-
     socket.on("voteRevealed", (roomId: string, callback: (response: CallbackResponse) => void) => {
       const room = rooms[roomId];
 
@@ -247,6 +247,8 @@ export function setupRooms(io: Server) {
           average: 0
         });
 
+        room.initVotes = true;
+
         io.to(roomId).emit("onInitVotes", {
           success: true,
           themes: room.themes,
@@ -299,7 +301,6 @@ export function setupRooms(io: Server) {
           delete room.players[userId];
           socket.leave(roomId);
 
-          console.log('cheguei aqui');
           io.to(roomId).emit("playerLeft", {
             success: true,
             message: getRandomAlertMessage("onDisconnect", player.userName)
@@ -309,13 +310,11 @@ export function setupRooms(io: Server) {
       }
     );
 
-
-
     socket.on("disconnect", () => {
       const entry = Array.from(userConnectionMap.entries())
         .find(([, info]) => info.socketId === socket.id);
       if (!entry) {
-        console.log(`❌ Disconnected ${socket.id} (sem userId)`);
+        // console.log(`❌ Disconnected ${socket.id} (sem userId)`);
         return;
       }
       const [userId] = entry;
@@ -339,7 +338,17 @@ export function setupRooms(io: Server) {
         });
       }, 7000);
       disconnectTimeouts.set(userId, timeout);
-      console.log(`⚠️ ${socket.id} aguardando reconexão de ${userId}`);
+      // console.log(`⚠️ ${socket.id} aguardando reconexão de ${userId}`);
     });
+    
   });
+}
+
+export function resetRoomsState() {
+  Object.keys(rooms).forEach((key) => delete rooms[key]);
+  userConnectionMap.clear();
+  for (const t of disconnectTimeouts.values()) {
+    clearTimeout(t);
+  }
+  disconnectTimeouts.clear();
 }

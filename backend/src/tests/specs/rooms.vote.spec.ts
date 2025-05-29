@@ -5,6 +5,7 @@ import {
   createRoom,
   joinPlayer,
   setupRoomWithPlayer,
+  setupRoomWithSpectator,
   initVotes,
   TestServer,
   resetRoomsState,
@@ -117,7 +118,7 @@ describe('Vote flow', () => {
   it('should reject spectator vote', async () => {
     const vote = fibonnaci[Math.floor(Math.random() * fibonnaci.length)];
 
-    await setupRoomWithPlayer(clientA, clientB);
+    await setupRoomWithSpectator(clientA, clientB);
     
     const voteRes = await votePlayer(clientB, {
       roomId: rooms.default.roomId,

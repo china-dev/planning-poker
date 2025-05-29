@@ -122,4 +122,12 @@ export async function setupRoomWithPlayer(
   await joinPlayer(clientB, { ...users.player, ...rooms.default });
 }
 
+export async function setupRoomWithSpectator(
+  clientA: Socket,
+  clientB: Socket
+): Promise<void> {
+  await createRoom(clientA, { ...users.admin, ...rooms.default });
+  await joinPlayer(clientB, { ...users.spectator, ...rooms.default });
+}
+
 export { resetRoomsState };

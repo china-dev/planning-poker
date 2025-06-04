@@ -29,7 +29,7 @@
     </div>
     <div class="tableVotes">
       <TransitionGroup
-        class="flex justify-center items-start"
+        class="flex justify-center items-start flex-wrap gap-2"
         name="fade"
         mode="out-in"
         tag="div"

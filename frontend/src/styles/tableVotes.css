@@ -2,8 +2,9 @@
   background-color: #2e7d32; /* cor verde feltro */
   border-radius: 50% / 30%;
   padding: 3rem;
-  width: 600px;
-  height: 350px;
+  width: 100%;
+  max-width: 600px;
+  min-height: 370px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
   border: 8px solid #3e3e3e; /* borda estilo madeira preta */
   display: flex;
